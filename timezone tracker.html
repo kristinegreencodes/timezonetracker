@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Time Updates</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: row;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.5s ease-in-out;
+    }
+
+    /* Sidebar */
+    #sidebar {
+      width: 260px;
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    #sidebar h3 {
+      margin-top: 0;
+      font-weight: normal;
+      font-size: 18px;
+      border-bottom: 1px solid #4a6272;
+      padding-bottom: 10px;
+    }
+
+    .toggle-group {
+      margin-bottom: 20px;
+      border-bottom: 1px solid #4a6272;
+      padding-bottom: 15px;
+    }
+
+    .toggle-group label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-group input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(0.8);
+    }
+
+    .custom-tz-label {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    #customTimezoneSelect {
+      width: 100%;
+      padding: 5px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+    }
+
+    /* Background upload group */
+    #backgroundUploadGroup {
+      margin-top: 20px;
+      border-top: 1px solid #4a6272;
+      padding-top: 15px;
+    }
+
+    #backgroundUploadGroup label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    #backgroundUploadGroup input[type="file"] {
+      width: 100%;
+      cursor: pointer;
+    }
+
+    #clearBackgroundBtn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
+      background-color: #e74c3c;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+    }
+    #clearBackgroundBtn:hover {
+      background-color: #c0392b;
+    }
+
+    /* Main content */
+    #mainContent {
+      flex-grow: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    h1 {
+      text-align: center;
+margin-bottom: 20px;
+font-weight: normal;
+font-size: 28px;
+color: #ffffff; /* White text color */
+text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; /* Black border effect */
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .time-display {
+      font-family: monospace;
+      font-size: 40px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .date-display {
+      font-size: 14px;
+      text-align: center;
+      color: #666;
+    }
+
+    /* Small calendar in sidebar */
+    #smallCalendar {
+      max-width: 100%;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      background: #34495e;
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      color: white;
+      margin-top: 20px;
+    }
+
+    #smallCalendar caption {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+      text-align: center;
+      color: #ecf0f1;
+    }
+
+    #smallCalendar table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #smallCalendar th,
+    #smallCalendar td {
+      width: 14.28%;
+      text-align: center;
+      padding: 4px 0;
+      color: #ecf0f1;
+    }
+
+    #smallCalendar .today {
+      background-color: #2980b9;
+      color: white;
+      border-radius: 20%;
+    }
+
+    /* Scrollbar for sidebar */
+    #sidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb {
+      background: #4a6272;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar">
+    <div>
+      <h3>Timezones</h3>
+      <div class="toggle-group">
+        <label>
+          <input type="checkbox" class="toggle-timezone" data-id="pst" checked />
+          PST Time (Los Angeles)
+        </label>
+      </div>
+      <div class="toggle-group">
+        <label>
+          <input type="checkbox" class="toggle-timezone" data-id="mst" checked />
+          MST Time (Denver)
+        </label>
+      </div>
+      <div class="toggle-group">
+        <label>
+          <input type="checkbox" class="toggle-timezone" data-id="cst" checked />
+          CST Time (Iowa)
+        </label>
+      </div>
+      <div class="toggle-group">
+        <label>
+          <input type="checkbox" class="toggle-timezone" data-id="est" checked />
+          EST Time (New York)
+        </label>
+      </div>
+
+      <div class="toggle-group">
+        <label>
+          <input type="checkbox" class="toggle-timezone" data-id="custom" checked />
+          Custom Timezone
+        </label>
+        <div class="custom-tz-label">Select Timezone:</div>
+        <select id="customTimezoneSelect" aria-label="Custom timezone selector">
+          <option value="Asia/Manila" data-country="Philippines" selected>Asia/Manila (Philippines)</option>
+          <option value="Europe/London" data-country="United Kingdom">Europe/London (United Kingdom)</option>
+          <option value="Europe/Paris" data-country="France">Europe/Paris (France)</option>
+          <option value="Asia/Tokyo" data-country="Japan">Asia/Tokyo (Japan)</option>
+          <option value="Australia/Sydney" data-country="Australia">Australia/Sydney (Australia)</option>
+          <option value="America/Sao_Paulo" data-country="Brazil">America/Sao_Paulo (Brazil)</option>
+          <option value="Africa/Johannesburg" data-country="South Africa">Africa/Johannesburg (South Africa)</option>
+          <option value="Pacific/Auckland" data-country="New Zealand">Pacific/Auckland (New Zealand)</option>
+          <option value="America/Anchorage" data-country="USA - Alaska">America/Anchorage (USA - Alaska)</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="smallCalendar" aria-label="Small monthly calendar"></div>
+
+    <!-- Background upload now at the bottom -->
+    <div id="backgroundUploadGroup">
+      <label for="bgUploadInput">Upload Background Wallpaper:</label>
+      <input type="file" id="bgUploadInput" accept="image/*" aria-label="Upload background wallpaper" />
+      <button id="clearBackgroundBtn" aria-label="Clear background wallpaper">Clear Background</button>
+    </div>
+  </div>
+
+  <div id="mainContent">
+    <h1>Live Time Updates</h1>
+    <div class="grid">
+      <div class="card" id="pstCard">
+        <h2>PST Time (Los Angeles)</h2>
+        <div class="time-display" id="pstTime">--:--:--</div>
+        <div class="date-display" id="pstDate">---</div>
+      </div>
+
+      <div class="card" id="mstCard">
+        <h2>MST Time (Denver)</h2>
+        <div class="time-display" id="mstTime">--:--:--</div>
+        <div class="date-display" id="mstDate">---</div>
+      </div>
+
+      <div class="card" id="cstCard">
+        <h2>CST Time (Iowa)</h2>
+        <div class="time-display" id="cstTime">--:--:--</div>
+        <div class="date-display" id="cstDate">---</div>
+      </div>
+
+      <div class="card" id="estCard">
+        <h2>EST Time (New York)</h2>
+        <div class="time-display" id="estTime">--:--:--</div>
+        <div class="date-display" id="estDate">---</div>
+      </div>
+
+      <div class="card" id="customCard">
+        <h2 id="customCardTitle">Custom Timezone (Asia/Manila)</h2>
+        <div class="time-display" id="customTime">--:--:--</div>
+        <div class="date-display" id="customDate">---</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Utilities
+    function formatDateWithDay(date, timeZone) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short', timeZone };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // Elements
+    const toggles = document.querySelectorAll('.toggle-timezone');
+    const customSelect = document.getElementById('customTimezoneSelect');
+    const customCard = document.getElementById('customCard');
+    const customCardTitle = document.getElementById('customCardTitle');
+
+    // Timezone map
+    const timezoneMap = {
+      pst: { tz: 'America/Los_Angeles', name: 'PST Time (Los Angeles)' },
+      mst: { tz: 'America/Denver', name: 'MST Time (Denver)' },
+      cst: { tz: 'America/Chicago', name: 'CST Time (Iowa)' },
+      est: { tz: 'America/New_York', name: 'EST Time (New York)' },
+    };
+
+    // Update all clocks
+    function updateClocks() {
+      const now = new Date();
+
+      Object.entries(timezoneMap).forEach(([id, info]) => {
+        if (document.getElementById(id + 'Card').style.display !== 'none') {
+          const timeEl = document.getElementById(id + 'Time');
+          const dateEl = document.getElementById(id + 'Date');
+          const timeString = now.toLocaleTimeString('en-US', { timeZone: info.tz, hour12: true });
+          const dateString = formatDateWithDay(now, info.tz);
+          timeEl.textContent = timeString;
+          dateEl.textContent = dateString;
+        }
+      });
+
+      // Custom timezone
+      const customToggle = document.querySelector('input[data-id="custom"]');
+      if (customToggle.checked) {
+        const customTZ = customSelect.value;
+        customCard.style.display = 'block';
+        customCardTitle.textContent = `Custom Timezone (${customTZ})`;
+        const timeEl = document.getElementById('customTime');
+        const dateEl = document.getElementById('customDate');
+        const timeString = now.toLocaleTimeString('en-US', { timeZone: customTZ, hour12: true });
+        const dateString = formatDateWithDay(now, customTZ);
+        timeEl.textContent = timeString;
+        dateEl.textContent = dateString;
+      } else {
+        customCard.style.display = 'none';
+      }
+    }
+
+    // Small monthly calendar render
+    function renderSmallCalendar() {
+      const smallCal = document.getElementById('smallCalendar');
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDay = firstDay.getDay(); // Sunday = 0
+      const totalDays = lastDay.getDate();
+
+      let html = `<table aria-label="Calendar for current month"><caption>${now.toLocaleString('en-US', { month: 'long' })} ${year}</caption><thead><tr>`;
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      days.forEach(day => html += `<th scope="col">${day}</th>`);
+      html += '</tr></thead><tbody><tr>';
+
+      // Blank cells before first day
+      for (let i = 0; i < startDay; i++) {
+        html += '<td></td>';
+      }
+
+      for (let dayNum = 1; dayNum <= totalDays; dayNum++) {
+        const todayClass = (dayNum === now.getDate()) ? 'today' : '';
+        html += `<td class="${todayClass}">${dayNum}</td>`;
+        if ((startDay + dayNum) % 7 === 0 && dayNum !== totalDays) {
+          html += '</tr><tr>';
+        }
+      }
+
+      // Blank cells after last day
+      const endBlank = (7 - (startDay + totalDays) % 7) % 7;
+      for (let i = 0; i < endBlank; i++) {
+        html += '<td></td>';
+      }
+
+      html += '</tr></tbody></table>';
+      smallCal.innerHTML = html;
+    }
+
+    // Initialize toggles display and cards visibility
+    toggles.forEach(toggle => {
+      const id = toggle.dataset.id;
+      const card = document.getElementById(id + 'Card');
+      card.style.display = toggle.checked ? 'block' : 'none';
+
+      toggle.addEventListener('change', () => {
+        card.style.display = toggle.checked ? 'block' : 'none';
+      });
+    });
+
+    // Custom timezone select change: update immediately
+    customSelect.addEventListener('change', updateClocks);
+
+    // Background upload elements
+    const bgUploadInput = document.getElementById('bgUploadInput');
+    const clearBgBtn = document.getElementById('clearBackgroundBtn');
+
+    bgUploadInput.addEventListener('change', () => {
+      const file = bgUploadInput.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          document.body.style.backgroundImage = `url(${e.target.result})`;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Please select a valid image file.');
+      }
+    });
+
+    clearBgBtn.addEventListener('click', () => {
+      document.body.style.backgroundImage = '';
+      bgUploadInput.value = '';
+    });
+
+    // Initial render
+    renderSmallCalendar();
+
+    // Start clock updates
+    updateClocks();
+    setInterval(updateClocks, 1000);
+  </script>
+
+</body>
+</html>
