@@ -1,0 +1,2479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Live Time Updates</title>
+  <style>
+    /* Default (Light) Theme Variables */
+    :root {
+      --body-bg-color: #f9f9f9;
+      --main-text-color: #000;
+      --card-bg-color: #fff;
+      --card-text-color: #000;
+      --card-date-color: #666;
+      --sidebar-bg-color: #2c3e50;
+      --sidebar-text-color: white;
+      --sidebar-border-color: #4a6272;
+      --sidebar-input-bg: #ecf0f1; /* for select dropdown */
+      --sidebar-input-color: #000; /* for select text */
+      --clear-btn-bg: #e74c3c;
+      --clear-btn-hover-bg: #c0392b;
+      --calendar-bg-color: #34495e;
+      --calendar-text-color: #ecf0f1;
+      --calendar-today-bg: #2980b9;
+      --h1-text-color: #ffffff;
+      --h1-text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+      --h1-font-size: 28px; /* New variable for H1 font size */
+
+      /* To-Do List specific variables */
+      --todo-border-color: #4a6272;
+      --todo-input-bg: #ecf0f1;
+      --todo-input-color: #000;
+      --todo-placeholder-color: #999;
+      --todo-item-bg: #3b526b;
+      --todo-item-text: white;
+      --todo-item-border: #4a6272;
+      --todo-checked-text: #b0b0b0;
+      --todo-checked-bg: #2d3e4e;
+
+      /* About/Collapsible Sections specific styling */
+      --collapsible-summary-color: white;
+      --collapsible-text-color: #ecf0f1;
+      --collapsible-link-color: #87ceeb; /* Sky blue for links */
+      --collapsible-bg-color: #34495e; /* Matching calendar/darker sidebar elements */
+
+      /* Sidebar Local Time Card */
+      --sidebar-local-card-bg: #34495e; /* Matching calendar/darker sidebar elements */
+      --sidebar-local-card-h2-color: white; /* Title color for local time in sidebar */
+      --sidebar-local-card-text-color: #ecf0f1;
+      --sidebar-local-card-date-color: #b0b0b0;
+
+      /* Donate Button (Fixed Position) */
+      --donate-btn-bg: #2ecc71; /* Green color */
+      --donate-btn-hover-bg: #27ae60;
+      --donate-btn-text: white;
+      --donate-section-bg: var(--collapsible-bg-color); /* Match collapsible section bg */
+      --donate-section-border: var(--sidebar-border-color);
+      --donate-section-text: var(--collapsible-text-color);
+      --donate-section-summary-color: var(--collapsible-summary-color);
+
+      /* DST Reminder - Adjusted for theme consistency */
+      --dst-reminder-bg: var(--sidebar-local-card-bg); /* Use a darker sidebar element color */
+      --dst-reminder-text: var(--sidebar-local-card-text-color);
+      --dst-reminder-border: var(--sidebar-border-color);
+      --dst-reminder-countdown-color: #b0b0b0; /* Slightly lighter for countdown */
+
+      /* Holiday Reminder - Consistent with other sidebar cards */
+      --holiday-reminder-bg: var(--sidebar-local-card-bg);
+      --holiday-reminder-text: var(--sidebar-local-card-text-color);
+      --holiday-reminder-border: var(--sidebar-border-color);
+      --holiday-reminder-h3-color: var(--sidebar-local-card-h2-color);
+      --holiday-reminder-p-color: var(--sidebar-local-card-text-color);
+
+      /* Year End Countdown */
+      --year-countdown-bg: var(--sidebar-local-card-bg);
+      --year-countdown-text: var(--sidebar-local-card-text-color);
+      --year-countdown-border: var(--sidebar-border-color);
+      --year-countdown-h3-color: var(--sidebar-local-card-h2-color);
+      --year-countdown-p-color: var(--sidebar-local-card-text-color);
+      --year-countdown-value-color: #87ceeb; /* Sky blue for the actual countdown numbers */
+
+
+      /* Notepad specific variables */
+      --notepad-bg: #ffffff;
+      --notepad-text-color: #000000;
+      --notepad-border-color: #ccc;
+
+      /* Calculator specific variables */
+      --calculator-bg: var(--sidebar-local-card-bg); /* Use a darker sidebar element color */
+      --calculator-border: var(--sidebar-border-color);
+      --calculator-display-bg: #222;
+      --calculator-display-color: white;
+      --calculator-button-bg: #444;
+      --calculator-button-hover-bg: #666;
+      --calculator-operator-bg: #f39c12; /* Orange */
+      --calculator-operator-hover-bg: #e67e22; /* Darker orange */
+      --calculator-equals-bg: #2ecc71; /* Green */
+      --calculator-equals-hover-bg: #27ae60; /* Darker green */
+      --calculator-clear-bg: #e74c3c; /* Red */
+      --calculator-clear-hover-bg: #c0392b; /* Darker red */
+      --calculator-button-text-color: white;
+      --calculator-display-font-size: 2em;
+    }
+
+    /* Dark Theme Overrides */
+    body.dark-theme {
+      --body-bg-color: #282c34;
+      --main-text-color: #e0e0e0;
+      --card-bg-color: #3b424c;
+      --card-text-color: #e0e0e0;
+      --card-date-color: #b0b0b0;
+      --sidebar-bg-color: #1a1e24;
+      --sidebar-text-color: #e0e0e0;
+      --sidebar-border-color: #3a414b;
+      --sidebar-input-bg: #4a515c;
+      --sidebar-input-color: #e0e0e0;
+      --clear-btn-bg: #e74c3c; /* Keeping clear button color consistent */
+      --clear-btn-hover-bg: #c0392b;
+      --calendar-bg-color: #2e353f;
+      --calendar-text-color: #e0e0e0;
+      --calendar-today-bg: #5599d1;
+      --h1-text-color: #e0e0e0;
+      --h1-text-shadow: none; /* No shadow needed in dark theme */
+
+      /* To-Do List specific variables (dark theme) */
+      --todo-border-color: #3a414b;
+      --todo-input-bg: #4a515c;
+      --todo-input-color: #e0e0e0;
+      --todo-placeholder-color: #888;
+      --todo-item-bg: #2e353f;
+      --todo-item-text: #e0e0e0;
+      --todo-item-border: #3a414b;
+      --todo-checked-text: #666;
+      --todo-checked-bg: #1f232a;
+
+      /* About/Collapsible Sections specific styling (dark theme) */
+      --collapsible-summary-color: #e0e0e0;
+      --collapsible-text-color: #b0b0b0;
+      --collapsible-link-color: #87ceeb; /* Sky blue for links */
+      --collapsible-bg-color: #2e353f; /* Matching calendar/darker sidebar elements */
+
+      /* Sidebar Local Time Card (dark theme) */
+      --sidebar-local-card-bg: #2e353f; /* Matching calendar/darker sidebar elements */
+      --sidebar-local-card-h2-color: #e0e0e0;
+      --sidebar-local-card-text-color: #e0e0e0;
+      --sidebar-local-card-date-color: #b0b0b0;
+
+      /* Donate Button (Fixed Position - dark theme) */
+      --donate-btn-bg: #27ae60;
+      --donate-btn-hover-bg: #1e8449;
+      --donate-btn-text: white;
+      --donate-section-bg: var(--collapsible-bg-color);
+      --donate-section-border: var(--sidebar-border-color);
+      --donate-section-text: var(--collapsible-text-color);
+      --donate-section-summary-color: var(--collapsible-summary-color);
+
+      /* DST Reminder (dark theme) - Adjusted for theme consistency */
+      --dst-reminder-bg: var(--sidebar-local-card-bg); /* Use a darker sidebar element color */
+      --dst-reminder-text: var(--sidebar-local-card-text-color);
+      --dst-reminder-border: var(--sidebar-border-color);
+      --dst-reminder-countdown-color: #888; /* Slightly darker for countdown */
+
+      /* Holiday Reminder (dark theme) - Consistent with other sidebar cards */
+      --holiday-reminder-bg: var(--sidebar-local-card-bg);
+      --holiday-reminder-text: var(--holiday-reminder-text);
+      --holiday-reminder-border: var(--sidebar-border-color);
+      --holiday-reminder-h3-color: var(--sidebar-local-card-h2-color);
+      --holiday-reminder-p-color: var(--sidebar-local-card-text-color);
+
+      /* Year End Countdown */
+      --year-countdown-bg: var(--sidebar-local-card-bg);
+      --year-countdown-text: var(--sidebar-local-card-text-color);
+      --year-countdown-border: var(--sidebar-border-color);
+      --year-countdown-h3-color: var(--sidebar-local-card-h2-color);
+      --year-countdown-p-color: var(--sidebar-local-card-text-color);
+      --year-countdown-value-color: #b0b0b0; /* Use a lighter gray for dark theme */
+
+
+      /* Notepad specific variables (dark theme) */
+      --notepad-bg: #4a515c;
+      --notepad-text-color: #e0e0e0;
+      --notepad-border-color: #3a414b;
+
+      /* Calculator specific variables (dark theme) */
+      --calculator-bg: var(--sidebar-local-card-bg);
+      --calculator-border: var(--sidebar-border-color);
+      --calculator-display-bg: #111;
+      --calculator-display-color: #e0e0e0;
+      --calculator-button-bg: #3a414b;
+      --calculator-button-hover-bg: #4a515c;
+      --calculator-operator-bg: #d35400; /* Darker orange */
+      --calculator-operator-hover-bg: #c14d00;
+      --calculator-equals-bg: #27ae60;
+      --calculator-equals-hover-bg: #1e8449;
+      --calculator-clear-bg: #c0392b;
+      --calculator-clear-hover-bg: #a62b1f;
+      --calculator-button-text-color: #e0e0e0;
+    }
+
+    /* Base Layout for larger screens (default) */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--body-bg-color);
+      color: var(--main-text-color);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex; /* Flex container for sidebar and main content */
+      flex-direction: row; /* Default: sidebar on left, main content on right */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: background-image 0.5s ease-in-out, background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    /* Left Sidebar */
+    #sidebar {
+      width: 260px; /* Fixed width for larger screens */
+      flex-shrink: 0; /* Prevents sidebar from shrinking if content in mainContent is too wide */
+      background: var(--sidebar-bg-color);
+      color: var(--sidebar-text-color);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto; /* Allow scrolling if content overflows */
+      height: 100vh; /* Take full viewport height */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    /* Right Sidebar */
+    #rightSidebar {
+      width: 260px; /* Fixed width for larger screens */
+      flex-shrink: 0;
+      background: var(--sidebar-bg-color);
+      color: var(--sidebar-text-color);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, width 0.3s ease-in-out;
+      position: relative; /* For the collapse button */
+    }
+
+    /* Styling for the collapse button on right sidebar */
+    #rightSidebarToggleBtn {
+        position: absolute;
+        left: -40px; /* Position outside the sidebar */
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 80px; /* Taller button */
+        background-color: var(--sidebar-bg-color);
+        color: var(--sidebar-text-color);
+        border: none;
+        border-top-left-radius: 8px;
+        border-bottom-left-radius: 8px;
+        cursor: pointer;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+        z-index: 10; /* Above main content */
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    #rightSidebar.collapsed {
+        width: 0;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    #rightSidebar.collapsed #rightSidebarToggleBtn {
+        left: 0; /* Move button to the edge when collapsed */
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 8px;
+        border-bottom-right-radius: 8px;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+    }
+
+    /* Ensure toggle button arrow changes direction */
+    #rightSidebarToggleBtn.collapsed-arrow::before {
+        content: '◀'; /* Left arrow when collapsed */
+    }
+    #rightSidebarToggleBtn:not(.collapsed-arrow)::before {
+        content: '▶'; /* Right arrow when open */
+    }
+
+    /* General sidebar content styling (applies to both) */
+    #sidebar h3, #rightSidebar h3 {
+      margin-top: 0;
+      font-weight: normal;
+      font-size: 18px;
+      border-bottom: 1px solid var(--sidebar-border-color);
+      padding-bottom: 10px;
+    }
+
+    .toggle-group {
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--sidebar-border-color);
+      padding-bottom: 15px;
+    }
+
+    .toggle-group label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle-group input[type="checkbox"] {
+      margin-right: 10px;
+      transform: scale(0.8);
+    }
+
+    .custom-tz-label {
+      margin-top: 10px;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .custom-timezone-select {
+      width: 100%;
+      padding: 5px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      background-color: var(--sidebar-input-bg);
+      color: var(--sidebar-input-color);
+    }
+
+    #backgroundUploadGroup label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    #backgroundUploadGroup input[type="file"] {
+      width: 100%;
+      cursor: pointer;
+      color: var(--sidebar-text-color);
+    }
+
+    #clearBackgroundBtn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 6px;
+      font-size: 14px;
+      background-color: var(--clear-btn-bg);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      user-select: none;
+    }
+    #clearBackgroundBtn:hover {
+      background-color: var(--clear-btn-hover-bg);
+    }
+
+    /* Main content */
+    #mainContent {
+      flex-grow: 1; /* Allows main content to take up remaining space */
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: normal;
+      font-size: var(--h1-font-size);
+      color: var(--h1-text-color);
+      text-shadow: var(--h1-text-shadow);
+      transition: color 0.3s ease-in-out, font-size 0.3s ease-in-out, text-shadow 0.3s ease-in-out;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Flexible grid for cards */
+      gap: 20px;
+    }
+
+    .card {
+      background-color: var(--card-bg-color);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      color: var(--card-text-color);
+      transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    .card h2 {
+      font-size: 18px;
+      margin-bottom: 12px;
+      text-align: center;
+      color: var(--card-text-color);
+    }
+
+    .time-display {
+      font-family: monospace;
+      font-size: 40px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .date-display {
+      font-size: 14px;
+      text-align: center;
+      color: var(--card-date-color);
+    }
+
+    /* Small calendar in sidebar */
+    #smallCalendarContainer {
+        margin-bottom: 20px; /* Space after calendar */
+        border-bottom: 1px solid var(--sidebar-border-color);
+        padding-bottom: 15px;
+    }
+
+    #smallCalendar {
+      max-width: 100%;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      background: var(--calendar-bg-color);
+      padding: 10px;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      color: var(--calendar-text-color);
+      margin-top: 10px; /* Space between select and calendar table */
+      transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    #smallCalendar caption {
+      font-weight: bold;
+      font-size: 14px;
+      margin-bottom: 6px;
+      text-align: center;
+      color: var(--calendar-text-color);
+    }
+
+    #smallCalendar table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    #smallCalendar th,
+    #smallCalendar td {
+      width: 14.28%;
+      text-align: center;
+      padding: 4px 0;
+      color: var(--calendar-text-color);
+    }
+
+    #smallCalendar .today {
+      background-color: var(--calendar-today-bg);
+      color: white;
+      border-radius: 20%;
+    }
+
+    /* To-Do List Styles */
+    #todoListContainer {
+        /* These styles now apply to the collapsible content */
+    }
+
+    #todoInput {
+        width: calc(100% - 10px); /* Adjust for padding */
+        padding: 8px 5px;
+        margin-bottom: 10px;
+        border: 1px solid var(--todo-border-color);
+        border-radius: 4px;
+        background-color: var(--todo-input-bg);
+        color: var(--todo-input-color);
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    }
+    #todoInput::placeholder {
+        color: var(--todo-placeholder-color);
+    }
+
+    #todoList {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    #todoList li {
+        display: flex;
+        align-items: center;
+        background-color: var(--todo-item-bg);
+        color: var(--todo-item-text);
+        padding: 8px 10px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        border: 1px solid var(--todo-item-border);
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+
+    #todoList li input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.1); /* Slightly larger checkbox */
+        cursor: pointer;
+    }
+
+    #todoList li.completed {
+        background-color: var(--todo-checked-bg);
+        color: var(--todo-checked-text);
+        text-decoration: line-through;
+        opacity: 0.7;
+    }
+
+    /* Collapsible Section Base Styles (About and Timezones) */
+    .collapsible-section {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid var(--sidebar-border-color);
+        font-size: 14px;
+    }
+    /* Specific adjustment for the main 'Settings' collapsible to ensure proper top spacing */
+    #settingsSection {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid var(--sidebar-border-color);
+    }
+
+    /* General Collapsible Styling for all collapsible sections */
+    .collapsible-section details, #rightSidebar .collapsible-section details {
+        border: 1px solid var(--sidebar-border-color);
+        border-radius: 4px;
+        overflow: hidden;
+        background-color: var(--collapsible-bg-color); /* Same as calendar for consistency */
+        color: var(--collapsible-text-color);
+        transition: background-color 0.3s ease-in-out;
+        margin-bottom: 10px; /* Space between main collapsibles */
+    }
+
+    #rightSidebar .collapsible-section details:last-child {
+        margin-bottom: 0; /* No bottom margin for the last one */
+    }
+
+
+    /* Remove border for nested details elements */
+    #settingsSection details details {
+        border: none;
+        border-radius: 0;
+        background-color: transparent; /* No background for nested sections */
+        margin-bottom: 5px; /* Space between nested collapsibles */
+    }
+    #settingsSection details details:last-child {
+        margin-bottom: 0;
+    }
+
+
+    .collapsible-section summary, #rightSidebar .collapsible-section summary {
+        display: block; /* Important for full clickable area and custom styling */
+        padding: 10px;
+        font-weight: bold;
+        cursor: pointer;
+        background-color: var(--collapsible-bg-color); /* Same as calendar */
+        color: var(--collapsible-summary-color);
+        border-bottom: 1px solid transparent; /* Placeholder for line when open */
+        transition: background-color 0.3s ease-in-out, border-bottom-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    /* Style for nested summaries */
+    #settingsSection details details summary {
+        background-color: transparent; /* No background */
+        color: var(--collapsible-text-color); /* Use text color */
+        padding: 8px 10px; /* Slightly less padding */
+        border-bottom: 1px dashed var(--sidebar-border-color); /* Dotted line */
+    }
+    #settingsSection details details[open] summary {
+        border-bottom-color: var(--sidebar-border-color);
+    }
+    #settingsSection details details:last-of-type[open] summary {
+        border-bottom: none; /* No border for the last open nested summary */
+    }
+    /* Ensure summary of the main 'Settings' section has a solid border */
+    #settingsSection > details > summary {
+        border-bottom: 1px solid transparent;
+    }
+    #settingsSection > details[open] > summary {
+        border-bottom-color: var(--sidebar-border-color);
+    }
+
+
+    .collapsible-section details[open] summary, #rightSidebar .collapsible-section details[open] summary {
+        border-bottom-color: var(--sidebar-border-color); /* Line when open */
+    }
+
+    .collapsible-section .collapsible-content, #rightSidebar .collapsible-section .collapsible-content {
+        padding: 10px;
+        line-height: 1.5;
+        font-size: 13px;
+        color: var(--collapsible-text-color);
+    }
+    /* No padding for nested content if it's just wrapping other details */
+    #settingsSection > details > .collapsible-content {
+        padding: 0; /* Remove padding from outer content */
+    }
+    #settingsSection details details .collapsible-content {
+        padding: 10px; /* Re-add padding for actual content */
+    }
+
+
+    .collapsible-section .collapsible-content p,
+    .collapsible-section .collapsible-content ul,
+    #rightSidebar .collapsible-section .collapsible-content p,
+    #rightSidebar .collapsible-section .collapsible-content ul {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+    .collapsible-section .collapsible-content ul,
+    #rightSidebar .collapsible-section .collapsible-content ul {
+        padding-left: 20px;
+    }
+    .collapsible-section .collapsible-content ul li,
+    #rightSidebar .collapsible-section .collapsible-content ul li {
+        margin-bottom: 5px;
+    }
+
+
+    .collapsible-section .collapsible-content a,
+    #rightSidebar .collapsible-section .collapsible-content a {
+        color: var(--collapsible-link-color);
+        text-decoration: none;
+    }
+    .collapsible-section .collapsible-content a:hover,
+    #rightSidebar .collapsible-section .collapsible-content a:hover {
+        text-decoration: underline;
+    }
+
+    /* Customizing the default disclosure triangle for collapsible sections */
+    .collapsible-section summary::-webkit-details-marker,
+    #rightSidebar .collapsible-section summary::-webkit-details-marker {
+        display: none; /* Hide default triangle in WebKit */
+    }
+    .collapsible-section summary::before,
+    #rightSidebar .collapsible-section summary::before {
+        content: '+ '; /* Custom plus sign */
+        display: inline-block;
+        margin-right: 5px;
+        transition: transform 0.2s ease-in-out;
+    }
+    .collapsible-section details[open] summary::before,
+    #rightSidebar .collapsible-section details[open] summary::before {
+        content: '- '; /* Custom minus sign when open */
+        transform: rotate(0deg); /* No rotation needed for +/- */
+    }
+
+
+    /* NEW: Sidebar Local Time Card styles */
+    #sidebarLocalTimeCard {
+        background-color: var(--sidebar-local-card-bg);
+        color: var(--sidebar-local-card-text-color);
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px; /* Space below it */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border: 1px solid var(--sidebar-border-color);
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+
+    #sidebarLocalTimeCard h2 {
+        font-size: 16px;
+        margin-top: 0;
+        margin-bottom: 8px;
+        text-align: center;
+        color: var(--sidebar-local-card-h2-color);
+    }
+
+    #sidebarLocalTimeCard .time-display {
+        font-size: 32px; /* Smaller than main content cards */
+        margin-bottom: 4px;
+        color: var(--sidebar-local-card-text-color);
+    }
+
+    #sidebarLocalTimeCard .date-display {
+        font-size: 12px; /* Smaller than main content cards */
+        color: var(--sidebar-local-card-date-color);
+    }
+
+    /* Specific adjustments for toggle groups within collapsible sections */
+    .collapsible-content .toggle-group {
+        margin-top: 15px; /* Add some top margin to the first toggle-group */
+        padding-top: 10px;
+        border-top: 1px solid var(--sidebar-border-color);
+        border-bottom: none; /* Remove the bottom border, as the section itself has a border */
+        padding-bottom: 0;
+    }
+
+    .collapsible-content .toggle-group:first-child {
+        margin-top: 0; /* Remove top margin for the very first toggle group if needed */
+        padding-top: 0;
+        border-top: none;
+    }
+
+    /* Styles for background upload group within collapsible */
+    .collapsible-content #backgroundUploadGroup {
+        margin-top: 0; /* Already inside padding of collapsible-content */
+        padding-top: 10px;
+        border-top: 1px solid var(--sidebar-border-color);
+    }
+
+    /* Fixed Donate Button Container */
+    #fixedDonateButtonContainer {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000; /* Ensure it's above other content */
+        font-size: 14px;
+    }
+
+    #fixedDonateButtonContainer details {
+        border: 1px solid var(--donate-section-border);
+        border-radius: 8px; /* More rounded corners for the floating element */
+        overflow: hidden;
+        background-color: var(--donate-section-bg);
+        color: var(--donate-section-text);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 250px; /* Fixed width for the expanded section */
+        transition: width 0.3s ease-in-out;
+    }
+
+    #fixedDonateButtonContainer details:not([open]) {
+        width: auto; /* Allow summary to size naturally when closed */
+    }
+
+    #fixedDonateButtonContainer summary {
+        display: block;
+        padding: 10px 15px;
+        font-weight: bold;
+        cursor: pointer;
+        background-color: var(--donate-btn-bg); /* Use donate button background */
+        color: var(--donate-btn-text);
+        border-bottom: 1px solid transparent;
+        border-radius: 8px; /* Match parent on closed state */
+        transition: background-color 0.2s ease-in-out, border-bottom-color 0.3s ease-in-out, border-radius 0.3s ease-in-out;
+        user-select: none; /* Prevent text selection */
+    }
+
+    /* Optional: Add a simple arrow or chevron for collapsible state */
+    #fixedDonateButtonContainer summary::after {
+        content: '▼'; /* Down arrow */
+        display: inline-block;
+        margin-left: 5px;
+        font-size: 0.8em;
+        vertical-align: middle;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    #fixedDonateButtonContainer details[open] summary::after {
+        content: '▲'; /* Up arrow when open */
+        transform: rotate(0deg); /* No rotation needed for triangles */
+    }
+
+    #fixedDonateButtonContainer .donate-content {
+        padding: 10px 15px;
+        line-height: 1.5;
+        font-size: 13px;
+        color: var(--donate-section-text);
+        background-color: var(--donate-section-bg);
+    }
+
+    #fixedDonateButtonContainer .donate-content p {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+    #fixedDonateButtonContainer .donate-content a {
+        display: block; /* Make the button fill the width */
+        text-align: center;
+        padding: 8px 12px;
+        background-color: var(--donate-btn-bg);
+        color: var(--donate-btn-text);
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-top: 10px;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    #fixedDonateButtonContainer .donate-content a:hover {
+        background-color: var(--donate-btn-hover-bg);
+        text-decoration: none;
+    }
+
+    /* DST Reminder Section */
+    #dstReminder {
+        background-color: var(--dst-reminder-bg);
+        color: var(--dst-reminder-text);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border: 1px solid var(--dst-reminder-border);
+        text-align: center;
+        font-size: 14px;
+        line-height: 1.4;
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        display: none; /* Hidden by default, shown when relevant */
+    }
+
+    #dstReminder p {
+        margin: 0;
+        padding: 0;
+    }
+
+    #dstReminder .countdown {
+        font-weight: bold;
+        font-size: 1.1em;
+        color: var(--dst-reminder-countdown-color);
+        display: block; /* Ensure it's on its own line */
+        margin-top: 5px;
+    }
+
+    /* NEW: Holiday Reminder Section */
+    #holidayReminder {
+        background-color: var(--holiday-reminder-bg);
+        color: var(--holiday-reminder-text);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px; /* Space below it */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border: 1px solid var(--holiday-reminder-border);
+        text-align: center;
+        line-height: 1.4;
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+        /* Initial display: none, set to block by JS to show message */
+    }
+
+    #holidayReminder h3 {
+        font-size: 16px;
+        margin-top: 0;
+        margin-bottom: 8px;
+        padding-bottom: 0; /* Remove default border-bottom for h3 */
+        border-bottom: none;
+        color: var(--holiday-reminder-h3-color);
+    }
+
+    #holidayReminder p {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+        color: var(--holiday-reminder-p-color);
+    }
+
+    /* NEW: Year End Countdown Section */
+    #yearEndCountdownContainer {
+        background-color: var(--year-countdown-bg);
+        color: var(--year-countdown-text);
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        border: 1px solid var(--year-countdown-border);
+        text-align: center;
+        line-height: 1.4;
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+    #yearEndCountdownContainer h3 {
+        font-size: 16px;
+        margin-top: 0;
+        margin-bottom: 8px;
+        padding-bottom: 0;
+        border-bottom: none;
+        color: var(--year-countdown-h3-color);
+    }
+    #yearEndCountdownValue {
+        font-weight: bold;
+        font-size: 1.2em; /* Slightly larger for emphasis */
+        color: var(--year-countdown-value-color);
+        display: block;
+        margin-top: 5px;
+    }
+
+
+    /* Notepad Specific Styles */
+    #notepadContainer {
+        /* No direct margin-top/padding-bottom here, managed by collapsible section */
+        flex-grow: 1; /* Allow it to take available space in the container */
+        display: flex;
+        flex-direction: column;
+    }
+    /* Notepad textarea itself */
+    #notepad {
+        width: 100%;
+        height: 100%; /* Take remaining height in the container */
+        min-height: 150px; /* Minimum height even if content is small */
+        padding: 10px;
+        box-sizing: border-box;
+        border: 1px solid var(--notepad-border-color);
+        border-radius: 4px;
+        background-color: var(--notepad-bg);
+        color: var(--notepad-text-color);
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        resize: vertical; /* Allow vertical resizing only */
+        line-height: 1.5;
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+    }
+    #notepad:focus {
+        outline: none;
+        border-color: var(--calendar-today-bg); /* Highlight on focus */
+        box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.2);
+    }
+
+    /* Calculator Styles */
+    #calculatorCollapsible {
+        /* Inherits from .collapsible-section */
+    }
+
+    #calculator {
+        background-color: var(--calculator-bg);
+        border: 1px solid var(--calculator-border);
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-family: Arial, sans-serif;
+        font-size: 1em;
+        transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
+    }
+
+    #calculatorDisplay {
+        width: calc(100% - 20px); /* Adjust for padding */
+        background-color: var(--calculator-display-bg);
+        color: var(--calculator-display-color);
+        border: none;
+        padding: 10px;
+        font-size: var(--calculator-display-font-size);
+        text-align: right;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: clip;
+        transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    .calculator-buttons {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+
+    .calculator-buttons button {
+        padding: 15px 0;
+        font-size: 1.2em;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: var(--calculator-button-bg);
+        color: var(--calculator-button-text-color);
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .calculator-buttons button:hover {
+        background-color: var(--calculator-button-hover-bg);
+    }
+
+    .calculator-buttons button.operator {
+        background-color: var(--calculator-operator-bg);
+    }
+
+    .calculator-buttons button.operator:hover {
+        background-color: var(--calculator-operator-hover-bg);
+    }
+
+    .calculator-buttons button.equals {
+        background-color: var(--calculator-equals-bg);
+        grid-column: span 2; /* Make equals button span two columns */
+    }
+
+    .calculator-buttons button.equals:hover {
+        background-color: var(--calculator-equals-hover-bg);
+    }
+
+    .calculator-buttons button.clear {
+        background-color: var(--calculator-clear-bg);
+    }
+
+    .calculator-buttons button.clear:hover {
+        background-color: var(--calculator-clear-hover-bg);
+    }
+
+    /* Scrollbar for sidebars */
+    #sidebar::-webkit-scrollbar, #rightSidebar::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    #sidebar::-webkit-scrollbar-thumb, #rightSidebar::-webkit-scrollbar-thumb {
+      background: var(--sidebar-border-color);
+      border-radius: 4px;
+    }
+
+
+    /* --- Media Queries for Responsiveness --- */
+
+    @media (max-width: 768px) { /* Applies when screen width is 768px or less */
+      body {
+        flex-direction: column; /* Stack sidebars and main content */
+      }
+
+      #sidebar, #rightSidebar {
+        width: 100%; /* Sidebars take full width */
+        height: auto; /* Height adjusts to content */
+        max-height: 40vh; /* Limit sidebar height to 40% of viewport height */
+        overflow-y: auto;
+      }
+
+      #mainContent {
+        padding: 15px; /* Adjust padding for smaller screens */
+      }
+
+      h1 {
+        font-size: 24px; /* Slightly smaller H1 on mobile */
+        text-shadow: none; /* Remove text shadow on mobile for better readability */
+      }
+
+      /* Adjust positions for fixed elements on smaller screens */
+      #fixedDonateButtonContainer {
+        bottom: 10px;
+        right: 10px;
+        width: auto;
+      }
+      #fixedDonateButtonContainer details {
+          max-width: calc(100vw - 20px);
+      }
+      #fixedDonateButtonContainer details[open] {
+          width: calc(100vw - 40px);
+      }
+
+      /* Mobile specific adjustments for right sidebar */
+      #rightSidebar {
+        position: relative; /* Not fixed on mobile */
+        order: 3; /* Place it at the bottom */
+        max-height: 50vh;
+      }
+      #rightSidebar.collapsed {
+        width: 100%; /* Still full width when collapsed on mobile */
+        height: auto; /* Allow height to adjust */
+        max-height: 50px; /* Only show header */
+        overflow: hidden;
+      }
+
+      #rightSidebarToggleBtn {
+        position: static; /* Not absolute on mobile */
+        width: auto;
+        height: auto;
+        border-radius: 0;
+        margin: 0 -20px 10px -20px; /* Extend button to full width of padded sidebar */
+        padding: 10px 20px;
+        box-shadow: none;
+        flex-direction: row-reverse; /* Arrow on right for mobile */
+        justify-content: space-between;
+      }
+      #rightSidebarToggleBtn.collapsed-arrow::before {
+          content: '▼'; /* Down arrow for collapsed mobile */
+      }
+      #rightSidebarToggleBtn:not(.collapsed-arrow)::before {
+          content: '▲'; /* Up arrow for open mobile */
+      }
+    }
+
+    @media (max-width: 480px) { /* Even smaller screens, e.g., portrait phones */
+        /* Further adjustments if needed for very small screens */
+        .time-display {
+            font-size: 32px; /* Reduce time display font size if space is very tight */
+        }
+        .card {
+            padding: 15px; /* Reduce card padding */
+        }
+        #fixedDonateButtonContainer summary {
+            padding: 8px 12px; /* Smaller padding for button */
+        }
+        #fixedDonateButtonContainer .donate-content {
+            padding: 8px 12px;
+        }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar">
+    <div id="sidebarLocalTimeCard">
+        <h2>Your Local Time (<span id="localTimezoneName"></span>)</h2>
+        <div class="time-display" id="localTime">--:--:--</div>
+        <div class="date-display" id="localDate">---</div>
+    </div>
+
+    <div id="dstReminder"></div>
+
+    <div id="smallCalendarContainer">
+      <h3>Calendar</h3>
+      <div class="custom-tz-label">Calendar:</div>
+      <select id="calendarTimezoneSelect" class="custom-timezone-select" aria-label="Calendar timezone selector">
+          </select>
+      <div id="smallCalendar" aria-label="Small monthly calendar"></div>
+    </div>
+
+    <div id="holidayReminder" style="display: none;">
+        <h3>This Week's USA Holiday</h3>
+        <p id="holidayText">No observed US holidays this week.</p>
+    </div>
+
+    <div id="yearEndCountdownContainer">
+        <h3>Time until Year End</h3>
+        <p id="yearEndCountdownValue">Calculating...</p>
+    </div>
+
+
+    <div id="settingsSection" class="collapsible-section">
+        <details>
+            <summary>Settings</summary>
+            <div class="collapsible-content">
+                <details>
+                    <summary>Theme Settings</summary>
+                    <div class="collapsible-content">
+                        <div class="toggle-group" style="margin-bottom: 0; border-bottom: none; padding-bottom: 0;">
+                            <label>
+                                <input type="checkbox" id="themeToggle" />
+                                Dark Mode
+                            </label>
+                        </div>
+                    </div>
+                </details>
+
+                <details>
+                    <summary>Background Settings</summary>
+                    <div class="collapsible-content">
+                        <div id="backgroundUploadGroup" style="margin-top: 0; border-top: none; padding-top: 0;">
+                            <label for="bgUploadInput">Upload Wallpaper:</label>
+                            <input type="file" id="bgUploadInput" accept="image/*" aria-label="Upload background wallpaper" />
+                            <button id="clearBackgroundBtn" aria-label="Clear background wallpaper">Clear Background</button>
+                        </div>
+                    </div>
+                </details>
+
+                <details open> <summary>Timezone Settings</summary>
+                    <div class="collapsible-content timezone-content">
+                        <div class="toggle-group">
+                            <label>
+                                <input type="checkbox" class="toggle-timezone" data-id="pst" checked />
+                                PST (Los Angeles)
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <label>
+                                <input type="checkbox" class="toggle-timezone" data-id="mst" checked />
+                                MST (Denver)
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <label>
+                                <input type="checkbox" class="toggle-timezone" data-id="cst" checked />
+                                CST (Chicago)
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <label>
+                                <input type="checkbox" class="toggle-timezone" data-id="est" checked />
+                                EST (New York)
+                            </label>
+                        </div>
+
+                        <div class="toggle-group">
+                            <label>
+                                <input type="checkbox" class="toggle-timezone" data-id="custom1" checked />
+                                Custom Timezone 1
+                            </label>
+                            <div class="custom-tz-label">Select Timezone:</div>
+                            <select class="custom-timezone-select" data-custom-id="custom1" aria-label="Custom timezone 1 selector">
+                                <option value="Africa/Abidjan" data-country="Ivory Coast">Africa/Abidjan (Ivory Coast)</option>
+                                <option value="Africa/Cairo" data-country="Egypt">Africa/Cairo (Egypt)</option>
+                                <option value="Africa/Johannesburg" data-country="South Africa">Africa/Johannesburg (South Africa)</option>
+                                <option value="Africa/Lagos" data-country="Nigeria">Africa/Lagos (Nigeria)</option>
+                                <option value="Africa/Nairobi" data-country="Kenya">Africa/Nairobi (Kenya)</option>
+
+                                <option value="America/Anchorage" data-country="USA - Alaska">America/Anchorage (USA - Alaska)</option>
+                                <option value="America/Chicago" data-country="USA - Central">America/Chicago (USA - Central)</option>
+                                <option value="America/New_York" data-country="USA - Eastern">America/New_York (USA - Eastern)</option>
+                                <option value="America/Sao_Paulo" data-country="Brazil">America/Sao_Paulo (Brazil)</option>
+                                <option value="America/Los_Angeles" data-country="USA - Pacific">America/Los_Angeles (USA - Pacific)</option>
+
+                                <option value="Asia/Manila" data-country="Philippines" selected>Asia/Manila (Philippines)</option>
+                                <option value="Asia/Tokyo" data-country="Japan">Asia/Tokyo (Japan)</option>
+                                <option value="Asia/Kolkata" data-country="India">Asia/Kolkata (India)</option>
+                                <option value="Asia/Shanghai" data-country="China">Asia/Shanghai (China)</option>
+                                <option value="Asia/Dubai" data-country="UAE">Asia/Dubai (UAE)</option>
+                                <option value="Asia/Bangkok" data-country="Thailand">Asia/Bangkok (Thailand)</option>
+
+                                <option value="Australia/Sydney" data-country="Australia">Australia/Sydney (Australia)</option>
+                                <option value="Pacific/Auckland" data-country="New Zealand">Pacific/Auckland (New Zealand)</option>
+                                <option value="Pacific/Honolulu" data-country="USA - Hawaii">Pacific/Honolulu (USA - Hawaii)</option>
+                                <option value="Pacific/Fiji" data-country="Fiji">Pacific/Fiji (Fiji)</option>
+                                <option value="Pacific/Tahiti" data-country="French Polynesia">Pacific/Tahiti (French Polynesia)</option>
+
+                                <option value="America/St_Johns" data-country="Canada - Newfoundland">America/St_Johns (Canada - Newfoundland)</option>
+                                <option value="America/Halifax" data-country="Canada - Atlantic">America/Halifax (Canada - Atlantic)</option>
+                                <option value="America/Toronto" data-country="Canada - Eastern">America/Toronto (Canada - Eastern)</option>
+                                <option value="America/Winnipeg" data-country="Canada - Central">America/Winnipeg (Canada - Central)</option>
+                                <option value="America/Edmonton" data-country="Canada - Mountain">America/Edmonton (Canada - Mountain)</option>
+                                <option value="America/Vancouver" data-country="Canada - Pacific">America/Vancouver (Canada - Pacific)</option>
+                                <option value="America/Whitehorse" data-country="Canada - Yukon">America/Whitehorse (Canada - Yukon)</option>
+                                <option value="America/Yellowknife" data-country="Canada - Northwest Territories">America/Yellowknife (Canada - Northwest Territories)</option>
+                                <option value="America/Iqaluit" data-country="Canada - Nunavut">America/Iqaluit (Canada - Nunavut)</option>
+
+                                <option value="Europe/London" data-country="United Kingdom">Europe/London (United Kingdom)</option>
+                                <option value="Europe/Paris" data-country="France">Europe/Paris (France)</option>
+                                <option value="Europe/Berlin" data-country="Germany">Europe/Berlin (Germany)</option>
+                                <option value="Europe/Moscow" data-country="Russia">Europe/Moscow (Russia)</option>
+                                <option value="Europe/Istanbul" data-country="Turkey">Europe/Istanbul (Turkey)</option>
+
+                                <option value="UTC" data-country="Universal">UTC (Coordinated Universal Time)</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-group">
+                            <label>
+                                <input type="checkbox" class="toggle-timezone" data-id="custom2" checked />
+                                Custom Timezone 2
+                            </label>
+                            <div class="custom-tz-label">Select Timezone:</div>
+                            <select class="custom-timezone-select" data-custom-id="custom2" aria-label="Custom timezone 2 selector">
+                                <option value="Africa/Abidjan" data-country="Ivory Coast">Africa/Abidjan (Ivory Coast)</option>
+                                <option value="Africa/Cairo" data-country="Egypt">Africa/Cairo (Egypt)</option>
+                                <option value="Africa/Johannesburg" data-country="South Africa">Africa/Johannesburg (South Africa)</option>
+                                <option value="Africa/Lagos" data-country="Nigeria">Africa/Lagos (Nigeria)</option>
+                                <option value="Africa/Nairobi" data-country="Kenya">Africa/Nairobi (Kenya)</option>
+
+                                <option value="America/Anchorage" data-country="USA - Alaska">America/Anchorage (USA - Alaska)</option>
+                                <option value="America/Chicago" data-country="USA - Central">America/Chicago (USA - Central)</option>
+                                <option value="America/New_York" data-country="USA - Eastern">America/New_York (USA - Eastern)</option>
+                                <option value="America/Sao_Paulo" data-country="Brazil">America/Sao_Paulo (Brazil)</option>
+                                <option value="America/Los_Angeles" data-country="USA - Pacific">America/Los_Angeles (USA - Pacific)</option>
+
+                                <option value="Asia/Manila" data-country="Philippines">Asia/Manila (Philippines)</option>
+                                <option value="Asia/Tokyo" data-country="Japan" selected>Asia/Tokyo (Japan)</option>
+                                <option value="Asia/Kolkata" data-country="India">Asia/Kolkata (India)</option>
+                                <option value="Asia/Shanghai" data-country="China">Asia/Shanghai (China)</option>
+                                <option value="Asia/Dubai" data-country="UAE">Asia/Dubai (UAE)</option>
+                                <option value="Asia/Bangkok" data-country="Thailand">Asia/Bangkok (Thailand)</option>
+
+                                <option value="Australia/Sydney" data-country="Australia">Australia/Sydney (Australia)</option>
+                                <option value="Pacific/Auckland" data-country="New Zealand">Pacific/Auckland (New Zealand)</option>
+                                <option value="Pacific/Honolulu" data-country="USA - Hawaii">Pacific/Honolulu (USA - Hawaii)</option>
+                                <option value="Pacific/Fiji" data-country="Fiji">Pacific/Fiji (Fiji)</option>
+                                <option value="Pacific/Tahiti" data-country="French Polynesia">Pacific/Tahiti (French Polynesia)</option>
+
+                                <option value="America/St_Johns" data-country="Canada - Newfoundland">America/St_Johns (Canada - Newfoundland)</option>
+                                <option value="America/Halifax" data-country="Canada - Atlantic">America/Halifax (Canada - Atlantic)</option>
+                                <option value="America/Toronto" data-country="Canada - Eastern">America/Toronto (Canada - Eastern)</option>
+                                <option value="America/Winnipeg" data-country="Canada - Central">America/Winnipeg (Canada - Central)</option>
+                                <option value="America/Edmonton" data-country="Canada - Mountain">America/Edmonton (Canada - Mountain)</option>
+                                <option value="America/Vancouver" data-country="Canada - Pacific">America/Vancouver (Canada - Pacific)</option>
+                                <option value="America/Whitehorse" data-country="Canada - Yukon">America/Whitehorse (Canada - Yukon)</option>
+                                <option value="America/Yellowknife" data-country="Canada - Northwest Territories">America/Yellowknife (Canada - Northwest Territories)</option>
+                                <option value="America/Iqaluit" data-country="Canada - Nunavut">America/Iqaluit (Canada - Nunavut)</option>
+
+                                <option value="Europe/London" data-country="United Kingdom">Europe/London (United Kingdom)</option>
+                                <option value="Europe/Paris" data-country="France">Europe/Paris (France)</option>
+                                <option value="Europe/Berlin" data-country="Germany">Europe/Berlin (Germany)</option>
+                                <option value="Europe/Moscow" data-country="Russia">Europe/Moscow (Russia)</option>
+                                <option value="Europe/Istanbul" data-country="Turkey">Europe/Istanbul (Turkey)</option>
+
+                                <option value="UTC" data-country="Universal">UTC (Coordinated Universal Time)</option>
+                            </select>
+                        </div>
+
+                        <div class="toggle-group">
+                            <label>
+                                <input type="checkbox" class="toggle-timezone" data-id="custom3" checked />
+                                Custom Timezone 3
+                            </label>
+                            <div class="custom-tz-label">Select Timezone:</div>
+                            <select class="custom-timezone-select" data-custom-id="custom3" aria-label="Custom timezone 3 selector">
+                                <option value="Africa/Abidjan" data-country="Ivory Coast">Africa/Abidjan (Ivory Coast)</option>
+                                <option value="Africa/Cairo" data-country="Egypt">Africa/Cairo (Egypt)</option>
+                                <option value="Africa/Johannesburg" data-country="South Africa">Africa/Johannesburg (South Africa)</option>
+                                <option value="Africa/Lagos" data-country="Nigeria">Africa/Lagos (Nigeria)</option>
+                                <option value="Africa/Nairobi" data-country="Kenya">Africa/Nairobi (Kenya)</option>
+
+                                <option value="America/Anchorage" data-country="USA - Alaska">America/Anchorage (USA - Alaska)</option>
+                                <option value="America/Chicago" data-country="USA - Central">America/Chicago (USA - Central)</option>
+                                <option value="America/New_York" data-country="USA - Eastern">America/New_York (USA - Eastern)</option>
+                                <option value="America/Sao_Paulo" data-country="Brazil">America/Sao_Paulo (Brazil)</option>
+                                <option value="America/Los_Angeles" data-country="USA - Pacific">America/Los_Angeles (USA - Pacific)</option>
+
+                                <option value="Asia/Manila" data-country="Philippines">Asia/Manila (Philippines)</option>
+                                <option value="Asia/Tokyo" data-country="Japan">Asia/Tokyo (Japan)</option>
+                                <option value="Asia/Kolkata" data-country="India">Asia/Kolkata (India)</option>
+                                <option value="Asia/Shanghai" data-country="China">Asia/Shanghai (China)</option>
+                                <option value="Asia/Dubai" data-country="UAE">Asia/Dubai (UAE)</option>
+                                <option value="Asia/Bangkok" data-country="Thailand" selected>Asia/Bangkok (Thailand)</option>
+
+                                <option value="Australia/Sydney" data-country="Australia">Australia/Sydney (Australia)</option>
+                                <option value="Pacific/Auckland" data-country="New Zealand">Pacific/Auckland (New Zealand)</option>
+                                <option value="Pacific/Honolulu" data-country="USA - Hawaii">Pacific/Honolulu (USA - Hawaii)</option>
+                                <option value="Pacific/Fiji" data-country="Fiji">Pacific/Fiji (Fiji)</option>
+                                <option value="Pacific/Tahiti" data-country="French Polynesia">Pacific/Tahiti (French Polynesia)</option>
+
+                                <option value="America/St_Johns" data-country="Canada - Newfoundland">America/St_Johns (Canada - Newfoundland)</option>
+                                <option value="America/Halifax" data-country="Canada - Atlantic">America/Halifax (Canada - Atlantic)</option>
+                                <option value="America/Toronto" data-country="Canada - Eastern">America/Toronto (Canada - Eastern)</option>
+                                <option value="America/Winnipeg" data-country="Canada - Central">America/Winnipeg (Canada - Central)</option>
+                                <option value="America/Edmonton" data-country="Canada - Mountain">America/Edmonton (Canada - Mountain)</option>
+                                <option value="America/Vancouver" data-country="Canada - Pacific">America/Vancouver (Canada - Pacific)</option>
+                                <option value="America/Whitehorse" data-country="Canada - Yukon">America/Yukon (Canada - Yukon)</option>
+                                <option value="America/Yellowknife" data-country="Canada - Northwest Territories">America/Yellowknife (Canada - Northwest Territories)</option>
+                                <option value="America/Iqaluit" data-country="Canada - Nunavut">America/Iqaluit (Canada - Nunavut)</option>
+
+                                <option value="Europe/London" data-country="United Kingdom">Europe/London (United Kingdom)</option>
+                                <option value="Europe/Paris" data-country="France">Europe/Paris (France)</option>
+                                <option value="Europe/Berlin" data-country="Germany">Europe/Berlin (Germany)</option>
+                                <option value="Europe/Moscow" data-country="Russia">Europe/Moscow (Russia)</option>
+                                <option value="Europe/Istanbul" data-country="Turkey">Europe/Istanbul (Turkey)</option>
+
+                                <option value="UTC" data-country="Universal">UTC (Coordinated Universal Time)</option>
+                            </select>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </details>
+    </div>
+
+    <div id="aboutSection" class="collapsible-section">
+        <details>
+            <summary>About This Site</summary>
+            <div class="collapsible-content about-content">
+                <p>This is a simple web application designed to help you keep track of time across different timezones and manage your daily tasks.</p>
+                <p>
+                    Features include:
+                    <ul>
+                        <li>Live time displays for various timezones.</li>
+                        <li>Customizable timezone cards.</li>
+                        <li>A compact calendar for quick date reference.</li>
+                        <li>A persistent to-do list to manage your tasks.</li>
+                        <li>Light and Dark theme options.</li>
+                        <li>Custom background image upload with local storage persistence.</li>
+                        <li>Year-end countdown.</li>
+                        <li>Integrated simple calculator.</li>
+                    </ul>
+                </p>
+                <p>All settings and data (like your to-do list and background) are saved directly in your browser's local storage, so they will persist across sessions.</p>
+                <p>Developed by Kristine Green.</p>
+            </div>
+        </details>
+    </div>
+
+  </div>
+
+  <div id="mainContent">
+    <h1>Live Time Updates</h1>
+    <div class="grid">
+      <div class="card" id="pstCard">
+        <h2>PST (Los Angeles)</h2>
+        <div class="time-display" id="pstTime">--:--:--</div>
+        <div class="date-display" id="pstDate">---</div>
+      </div>
+
+      <div class="card" id="mstCard">
+        <h2>MST (Denver)</h2>
+        <div class="time-display" id="mstTime">--:--:--</div>
+        <div class="date-display" id="mstDate">---</div>
+      </div>
+
+      <div class="card" id="cstCard">
+        <h2>CST (Chicago)</h2>
+        <div class="time-display" id="cstTime">--:--:--</div>
+        <div class="date-display" id="cstDate">---</div>
+      </div>
+
+      <div class="card" id="estCard">
+        <h2>EST (New York)</h2>
+        <div class="time-display" id="estTime">--:--:--</div>
+        <div class="date-display" id="estDate">---</div>
+      </div>
+
+      <div class="card" id="custom1Card">
+        <h2 id="custom1CardTitle">Custom Timezone (Asia/Manila)</h2>
+        <div class="time-display" id="custom1Time">--:--:--</div>
+        <div class="date-display" id="custom1Date">---</div>
+      </div>
+
+      <div class="card" id="custom2Card">
+        <h2 id="custom2CardTitle">Custom Timezone (Asia/Tokyo)</h2>
+        <div class="time-display" id="custom2Time">--:--:--</div>
+        <div class="date-display" id="custom2Date">---</div>
+      </div>
+
+      <div class="card" id="custom3Card">
+        <h2 id="custom3CardTitle">Custom Timezone (Asia/Bangkok)</h2>
+        <div class="time-display" id="custom3Time">--:--:--</div>
+        <div class="date-display" id="custom3Date">---</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="rightSidebar">
+    <button id="rightSidebarToggleBtn" aria-label="Toggle Notepad Sidebar"></button>
+
+    <div id="notepadCollapsible" class="collapsible-section">
+        <details open> <summary>Notepad</summary>
+            <div class="collapsible-content">
+                <div id="notepadContainer">
+                    <textarea id="notepad" placeholder="Start typing your notes here..." aria-label="Notepad for personal notes"></textarea>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <div id="todoListCollapsible" class="collapsible-section">
+        <details open> <summary>To-Do List</summary>
+            <div class="collapsible-content">
+                <div id="todoListContainer">
+                    <input type="text" id="todoInput" placeholder="Add a new task (max 10)" maxlength="100" aria-label="New to-do item input" />
+                    <ul id="todoList">
+                        </ul>
+                </div>
+            </div>
+        </details>
+    </div>
+
+    <div id="calculatorCollapsible" class="collapsible-section">
+        <details open> <summary>Calculator</summary>
+            <div class="collapsible-content">
+                <div id="calculator">
+                    <input type="text" id="calculatorDisplay" value="0" readonly aria-label="Calculator display" />
+                    <div class="calculator-buttons">
+                        <button class="clear" data-value="C" aria-label="Clear calculator">C</button>
+                        <button class="operator" data-value="/" aria-label="Divide">/</button>
+                        <button class="operator" data-value="*" aria-label="Multiply">*</button>
+                        <button class="operator" data-value="-" aria-label="Subtract">-</button>
+                        <button data-value="7" aria-label="Seven">7</button>
+                        <button data-value="8" aria-label="Eight">8</button>
+                        <button data-value="9" aria-label="Nine">9</button>
+                        <button class="operator" data-value="+" aria-label="Add">+</button>
+                        <button data-value="4" aria-label="Four">4</button>
+                        <button data-value="5" aria-label="Five">5</button>
+                        <button data-value="6" aria-label="Six">6</button>
+                        <button data-value="1" aria-label="One">1</button>
+                        <button data-value="2" aria-label="Two">2</button>
+                        <button data-value="3" aria-label="Three">3</button>
+                        <button class="equals" data-value="=" aria-label="Calculate equals">=</button>
+                        <button data-value="0" aria-label="Zero">0</button>
+                        <button data-value="." aria-label="Decimal point">.</button>
+                    </div>
+                </div>
+            </div>
+        </details>
+    </div>
+
+  </div>
+
+
+  <div id="fixedDonateButtonContainer">
+      <details>
+          <summary>Donate</summary>
+          <div class="donate-content">
+              <p>Your donation helps us create free tools for freelancers and virtual assistants. Thank you for your support!</p>
+              <a href="https://www.paypal.com/donate/?business=7SJHX9HHH4W98&no_recurring=0&item_name=+Your+donation+helps+us+create+free+tools+for+freelancers+and+virtual+assistants.+Thank+you+for+your+support%21&currency_code=USD" target="_blank" rel="noopener noreferrer">Donate Now via PayPal</a>
+          </div>
+      </details>
+  </div>
+
+
+  <script>
+    // Time Utilities
+    function formatDateWithDay(date, timeZone) {
+      const options = { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short', timeZone };
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // Elements
+    const toggles = document.querySelectorAll('.toggle-timezone');
+    const customSelects = document.querySelectorAll('.custom-timezone-select');
+    const themeToggle = document.getElementById('themeToggle');
+    const calendarTimezoneSelect = document.getElementById('calendarTimezoneSelect');
+
+    // To-Do List Elements
+    const todoInput = document.getElementById('todoInput');
+    const todoList = document.getElementById('todoList');
+    const MAX_TODO_ITEMS = 10; // Maximum number of to-do items
+
+    // Local Time Elements (now in sidebar)
+    const localTimeEl = document.getElementById('localTime');
+    const localDateEl = document.getElementById('localDate');
+    const localTimezoneNameEl = document.getElementById('localTimezoneName');
+    const dstReminderEl = document.getElementById('dstReminder');
+
+    // Holiday Reminder Elements
+    const holidayReminderEl = document.getElementById('holidayReminder');
+    const holidayTextEl = document.getElementById('holidayText');
+
+    // Year End Countdown Elements
+    const yearEndCountdownValueEl = document.getElementById('yearEndCountdownValue');
+
+    // Right Sidebar / Notepad Elements
+    const rightSidebar = document.getElementById('rightSidebar');
+    const rightSidebarToggleBtn = document.getElementById('rightSidebarToggleBtn');
+    const notepad = document.getElementById('notepad');
+
+    const notepadCollapsible = document.getElementById('notepadCollapsible'); // New: Notepad details element
+    const todoListCollapsible = document.getElementById('todoListCollapsible'); // New: Todo List details element
+    const calculatorCollapsible = document.getElementById('calculatorCollapsible'); // New: Calculator details element
+
+
+    // Calculator Elements
+    const calculatorDisplay = document.getElementById('calculatorDisplay');
+    const calculatorButtons = document.querySelector('.calculator-buttons');
+
+
+    // Timezone map for fixed timezones
+    const timezoneMap = {
+      pst: { tz: 'America/Los_Angeles', name: 'PST (Los Angeles)' },
+      mst: { tz: 'America/Denver', name: 'MST (Denver)' },
+      cst: { tz: 'America/Chicago', name: 'CST (Chicago)' },
+      est: { tz: 'America/New_York', name: 'EST (New York)' },
+    };
+
+    // Array of all timezones for the calendar dropdown and custom timezones
+    const allTimezones = [
+        { value: "UTC", country: "Universal", display: "UTC (Coordinated Universal Time)" },
+        { value: "Asia/Manila", country: "Philippines", display: "Asia/Manila (Philippines)" },
+        { value: "Asia/Tokyo", country: "Japan", display: "Asia/Tokyo (Japan)" },
+        { value: "Asia/Kolkata", country: "India", display: "Asia/Kolkata (India)" },
+        { value: "Asia/Shanghai", country: "China", display: "Asia/Shanghai (China)" },
+        { value: "Asia/Dubai", country: "UAE", display: "Asia/Dubai (UAE)" },
+        { value: "Asia/Bangkok", country: "Thailand", display: "Asia/Bangok (Thailand)" },
+        { value: "Australia/Sydney", country: "Australia", display: "Australia/Sydney (Australia)" },
+        { value: "Europe/London", country: "United Kingdom", display: "Europe/London (United Kingdom)" },
+        { value: "Europe/Paris", country: "France", display: "Europe/Paris (France)" },
+        { value: "Europe/Berlin", country: "Germany", display: "Europe/Berlin (Germany)" },
+        { value: "Europe/Moscow", country: "Russia", display: "Europe/Moscow (Russia)" },
+        { value: "Europe/Istanbul", country: "Turkey", display: "Europe/Istanbul (Turkey)" },
+        { value: "Pacific/Auckland", country: "New Zealand", display: "Pacific/Auckland (New Zealand)" },
+
+    ];
+
+
+    // --- Settings Management ---
+    const SETTINGS_KEY = 'userTimezoneSettings';
+    const BACKGROUND_KEY = 'userBackgroundImage';
+    const THEME_KEY = 'userThemePreference';
+    const CALENDAR_TZ_KEY = 'calendarTimezonePreference';
+    const TODO_KEY = 'userTodoList';
+    const NOTEPAD_KEY = 'userNotepadContent'; // New key for notepad
+    const RIGHT_SIDEBAR_COLLAPSED_KEY = 'rightSidebarCollapsed'; // New key for sidebar state
+    const NOTEPAD_COLLAPSED_KEY = 'notepadCollapsibleState'; // New key
+    const TODO_COLLAPSED_KEY = 'todoCollapsibleState'; // New key
+    const CALCULATOR_COLLAPSED_KEY = 'calculatorCollapsibleState'; // New key for calculator
+
+
+    function saveSettings() {
+      const settings = {
+        toggles: {},
+        customTimezones: {}
+      };
+
+      toggles.forEach(toggle => {
+        settings.toggles[toggle.dataset.id] = toggle.checked;
+      });
+
+      customSelects.forEach(selectEl => {
+        settings.customTimezones[selectEl.dataset.customId] = selectEl.value;
+      });
+
+      try {
+        localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+        localStorage.setItem(CALENDAR_TZ_KEY, calendarTimezoneSelect.value);
+        localStorage.setItem(NOTEPAD_COLLAPSED_KEY, notepadCollapsible.open); // Save notepad collapsible state
+        localStorage.setItem(TODO_COLLAPSED_KEY, todoListCollapsible.open); // Save todo list collapsible state
+        localStorage.setItem(CALCULATOR_COLLAPSED_KEY, calculatorCollapsible.open); // Save calculator collapsible state
+
+      } catch (e) {
+        console.error("Error saving settings to localStorage:", e);
+      }
+    }
+
+    function loadSettings() {
+      try {
+        const savedSettings = JSON.parse(localStorage.getItem(SETTINGS_KEY));
+        const savedCalendarTZ = localStorage.getItem(CALENDAR_TZ_KEY);
+        const savedNotepadCollapsed = localStorage.getItem(NOTEPAD_COLLAPSED_KEY);
+        const savedTodoCollapsed = localStorage.getItem(TODO_COLLAPSED_KEY);
+        const savedCalculatorCollapsed = localStorage.getItem(CALCULATOR_COLLAPSED_KEY);
+
+
+        if (savedSettings) {
+          toggles.forEach(toggle => {
+            const id = toggle.dataset.id;
+            if (savedSettings.toggles.hasOwnProperty(id)) {
+              toggle.checked = savedSettings.toggles[id];
+            }
+          });
+
+          customSelects.forEach(selectEl => {
+            const customId = selectEl.dataset.customId;
+            if (savedSettings.customTimezones.hasOwnProperty(customId)) {
+              selectEl.value = savedSettings.customTimezones[customId];
+            }
+          });
+        }
+
+        if (savedCalendarTZ) {
+            calendarTimezoneSelect.value = savedCalendarTZ;
+        } else {
+            // Default calendar timezone: try user's local, fallback to UTC
+            calendarTimezoneSelect.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            // Check if the resolvedOptions().timeZone is actually one of our listed options
+            const isLocalTZInList = allTimezones.some(tz => tz.value === calendarTimezoneSelect.value);
+            if (!isLocalTZInList) {
+                calendarTimezoneSelect.value = "UTC"; // Fallback to UTC if browser's timezone isn't in our list
+            }
+        }
+
+        // Load collapsible states
+        notepadCollapsible.open = savedNotepadCollapsed === 'true';
+        todoListCollapsible.open = savedTodoCollapsed === 'true';
+        calculatorCollapsible.open = savedCalculatorCollapsed === 'true';
+
+
+      } catch (e) {
+        console.error("Error loading settings from localStorage:", e);
+        localStorage.removeItem(SETTINGS_KEY);
+        localStorage.removeItem(CALENDAR_TZ_KEY);
+        localStorage.removeItem(NOTEPAD_COLLAPSED_KEY);
+        localStorage.removeItem(TODO_COLLAPSED_KEY);
+        localStorage.removeItem(CALCULATOR_COLLAPSED_KEY);
+      }
+    }
+
+    function saveBackground(dataUrl) {
+      try {
+        localStorage.setItem(BACKGROUND_KEY, dataUrl);
+      } catch (e) {
+        console.error("Error saving background image to localStorage:", e);
+        alert('Could not save background image. It might be too large for your browser storage.');
+      }
+    }
+
+    function loadBackground() {
+      try {
+        const savedBackground = localStorage.getItem(BACKGROUND_KEY);
+        if (savedBackground) {
+          document.body.style.backgroundImage = `url(${savedBackground})`;
+        }
+      } catch (e) {
+        console.error("Error loading background image from localStorage:", e);
+      }
+    }
+
+    function saveTheme(theme) {
+      try {
+        localStorage.setItem(THEME_KEY, theme);
+      } catch (e) {
+        console.error("Error saving theme to localStorage:", e);
+      }
+    }
+
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+        themeToggle.checked = true;
+      } else {
+        document.body.classList.remove('dark-theme');
+        themeToggle.checked = false;
+      }
+    }
+
+    function loadTheme() {
+      try {
+        const savedTheme = localStorage.getItem(THEME_KEY);
+        if (savedTheme) {
+          applyTheme(savedTheme);
+        } else {
+          // Default theme if nothing saved
+          applyTheme('light');
+        }
+      } catch (e) {
+        console.error("Error loading theme from localStorage:", e);
+        applyTheme('light'); // Fallback to default
+      }
+    }
+
+    // --- To-Do List Functions ---
+    let todoItems = [];
+
+    function saveTodoList() {
+        try {
+            localStorage.setItem(TODO_KEY, JSON.stringify(todoItems));
+        }
+        catch (e) {
+            console.error("Error saving to-do list:", e);
+        }
+    }
+
+    function loadTodoList() {
+        try {
+            const savedList = localStorage.getItem(TODO_KEY);
+            if (savedList) {
+                todoItems = JSON.parse(savedList);
+                renderTodoList();
+            }
+        }
+        catch (e) {
+            console.error("Error loading to-do list:", e);
+            localStorage.removeItem(TODO_KEY); // Clear corrupted data
+        }
+    }
+
+    function renderTodoList() {
+        todoList.innerHTML = ''; // Clear current list
+        todoItems.forEach((item, index) => {
+            const li = document.createElement('li');
+            li.setAttribute('data-index', index);
+            li.className = item.completed ? 'completed' : '';
+            li.innerHTML = `
+                <input type="checkbox" ${item.completed ? 'checked' : ''} aria-label="Mark task as complete" />
+                <span>${item.text}</span>
+            `;
+            todoList.appendChild(li);
+        });
+        // Disable input if max items reached
+        todoInput.disabled = todoItems.length >= MAX_TODO_ITEMS;
+        todoInput.placeholder = todoItems.length >= MAX_TODO_ITEMS ? "Maximum 10 tasks reached" : "Add a new task (max 10)";
+    }
+
+    function addTodoItem(text) {
+        if (text.trim() === '' || todoItems.length >= MAX_TODO_ITEMS) {
+            return;
+        }
+        todoItems.push({ text: text.trim(), completed: false });
+        todoInput.value = ''; // Clear input
+        saveTodoList();
+        renderTodoList();
+    }
+
+    function toggleTodoItem(index) {
+        if (index >= 0 && index < todoItems.length) {
+            todoItems[index].completed = !todoItems[index].completed;
+            saveTodoList(); // Save even if not deleted yet, for persistent "checked" state
+            renderTodoList(); // Re-render to apply 'completed' class for strike-through
+
+            // Optional: delete after a short delay to show the strike-through
+            if (todoItems[index].completed) {
+                setTimeout(() => {
+                    deleteTodoItem(index);
+                }, 300); // Delete after 0.3 seconds
+            }
+        }
+    }
+
+    function deleteTodoItem(indexToDelete) {
+        // Filter out the item at the specific index
+        todoItems = todoItems.filter((_, index) => index !== indexToDelete);
+        saveTodoList();
+        renderTodoList();
+    }
+
+    // --- End To-Do List Functions ---
+
+    // --- Notepad Functions ---
+    function saveNotepadContent() {
+        try {
+            localStorage.setItem(NOTEPAD_KEY, notepad.value);
+        } catch (e) {
+            console.error("Error saving notepad content:", e);
+        }
+    }
+
+    function loadNotepadContent() {
+        try {
+            const savedContent = localStorage.getItem(NOTEPAD_KEY);
+            if (savedContent) {
+                notepad.value = savedContent;
+            }
+        } catch (e) {
+            console.error("Error loading notepad content:", e);
+        }
+    }
+
+    // --- Simple Calculator Functions ---
+    let currentInput = '0';
+    let operator = null;
+    let previousInput = '';
+    let resetDisplay = false;
+
+    function updateCalculatorDisplay() {
+        calculatorDisplay.value = currentInput;
+    }
+
+    function handleNumberClick(number) {
+        if (resetDisplay) {
+            currentInput = number;
+            resetDisplay = false;
+        } else {
+            currentInput = currentInput === '0' ? number : currentInput + number;
+        }
+        updateCalculatorDisplay();
+    }
+
+    function handleDecimalClick() {
+        if (resetDisplay) {
+            currentInput = '0.';
+            resetDisplay = false;
+        } else if (!currentInput.includes('.')) {
+            currentInput += '.';
+        }
+        updateCalculatorDisplay();
+    }
+
+    function handleOperatorClick(nextOperator) {
+        if (operator && !resetDisplay) {
+            calculate(); // Perform previous operation if an operator was already active
+        }
+        previousInput = currentInput;
+        operator = nextOperator;
+        resetDisplay = true;
+    }
+
+    function calculate() {
+        let result;
+        const prev = parseFloat(previousInput);
+        const current = parseFloat(currentInput);
+
+        if (isNaN(prev) || isNaN(current) || !operator) {
+            return; // Not enough info to calculate
+        }
+
+        switch (operator) {
+            case '+':
+                result = prev + current;
+                break;
+            case '-':
+                result = prev - current;
+                break;
+            case '*':
+                result = prev * current;
+                break;
+            case '/':
+                if (current === 0) {
+                    currentInput = 'Error';
+                    operator = null;
+                    previousInput = '';
+                    resetDisplay = true;
+                    updateCalculatorDisplay();
+                    return;
+                }
+                result = prev / current;
+                break;
+            default:
+                return;
+        }
+
+        currentInput = String(result);
+        operator = null;
+        previousInput = '';
+        resetDisplay = true; // Next number clicked will clear display
+        updateCalculatorDisplay();
+    }
+
+    function handleClearClick() {
+        currentInput = '0';
+        operator = null;
+        previousInput = '';
+        resetDisplay = false;
+        updateCalculatorDisplay();
+    }
+
+    // --- End Simple Calculator Functions ---
+
+
+    // --- Right Sidebar Collapsible Functions ---
+    function saveRightSidebarState() {
+        try {
+            localStorage.setItem(RIGHT_SIDEBAR_COLLAPSED_KEY, rightSidebar.classList.contains('collapsed'));
+        } catch (e) {
+            console.error("Error saving right sidebar state:", e);
+        }
+    }
+
+    function loadRightSidebarState() {
+        try {
+            const isCollapsed = localStorage.getItem(RIGHT_SIDEBAR_COLLAPSED_KEY) === 'true';
+            if (isCollapsed) {
+                rightSidebar.classList.add('collapsed');
+                rightSidebarToggleBtn.classList.add('collapsed-arrow');
+            } else {
+                rightSidebar.classList.remove('collapsed');
+                rightSidebarToggleBtn.classList.remove('collapsed-arrow');
+            }
+        } catch (e) {
+            console.error("Error loading right sidebar state:", e);
+        }
+    }
+
+    function toggleRightSidebar() {
+        rightSidebar.classList.toggle('collapsed');
+        rightSidebarToggleBtn.classList.toggle('collapsed-arrow');
+        saveRightSidebarState();
+    }
+
+    function updateCardVisibility() {
+      toggles.forEach(toggle => {
+        const id = toggle.dataset.id;
+        const card = document.getElementById(id + 'Card');
+        if (card) {
+          card.style.display = toggle.checked ? 'block' : 'none';
+        }
+      });
+    }
+
+    // Update all clocks
+    function updateClocks() {
+      const now = new Date(); // This is the user's local system time
+
+      // Update Local Time Card (now in sidebar)
+      localTimeEl.textContent = now.toLocaleTimeString('en-US', { hour12: true });
+      localDateEl.textContent = now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' });
+      // Display local timezone name (e.g., "Pacific Daylight Time" or "GMT+7")
+      localTimezoneNameEl.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace(/_/g, ' ');
+
+      Object.entries(timezoneMap).forEach(([id, info]) => {
+        const card = document.getElementById(id + 'Card');
+        if (card && card.style.display !== 'none') {
+          const timeEl = document.getElementById(id + 'Time');
+          const dateEl = document.getElementById(id + 'Date');
+          const timeString = now.toLocaleTimeString('en-US', { timeZone: info.tz, hour12: true });
+          const dateString = formatDateWithDay(now, info.tz);
+          timeEl.textContent = timeString;
+          dateEl.textContent = dateString;
+        }
+      });
+
+      customSelects.forEach(selectEl => {
+        const customId = selectEl.dataset.customId;
+        const customToggle = document.querySelector(`input[data-id="${customId}"]`);
+        const customCard = document.getElementById(`${customId}Card`);
+
+        if (customToggle && customToggle.checked) {
+          const customTZ = selectEl.value;
+          const selectedOption = selectEl.options[selectEl.selectedIndex];
+          const countryName = selectedOption ? selectedOption.dataset.country : '';
+
+          if (customCard) customCard.style.display = 'block';
+          
+          const customCardTitle = document.getElementById(`${customId}CardTitle`);
+          customCardTitle.textContent = `Custom Timezone (${countryName || customTZ.split('/').pop().replace(/_/g, ' ')})`;
+
+          const timeEl = document.getElementById(`${customId}Time`);
+          const dateEl = document.getElementById(`${customId}Date`);
+          const timeString = now.toLocaleTimeString('en-US', { timeZone: customTZ, hour12: true });
+          const dateString = formatDateWithDay(now, customTZ);
+          timeEl.textContent = timeString;
+          dateEl.textContent = dateString;
+        } else if (customCard) {
+          customCard.style.display = 'none';
+        }
+      });
+
+      // Update calendar as well
+      renderSmallCalendar();
+      // Update DST reminder
+      updateDstReminder(); // Moved here for real-time countdown, though major update can be less frequent
+      // Update Holiday reminder
+      updateHolidayReminder();
+      // Update Year End Countdown
+      updateYearEndCountdown();
+    }
+
+    // Small monthly calendar render
+    function renderSmallCalendar() {
+      const smallCal = document.getElementById('smallCalendar');
+      const selectedCalendarTZ = calendarTimezoneSelect.value;
+      
+      // Get the current date and time for the selected timezone
+      // This creates a Date object that reflects the current time in the specified timezone
+      const now = new Date(); // Current time in user's system timezone
+      const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric', timeZone: selectedCalendarTZ };
+      const nowInSelectedTZString = now.toLocaleString('en-US', options);
+      const dateInSelectedTZ = new Date(nowInSelectedTZString);
+
+      const year = dateInSelectedTZ.getFullYear();
+      const month = dateInSelectedTZ.getMonth(); // 0-indexed month in selected TZ
+      const currentDayInTZ = dateInSelectedTZ.getDate(); // Current day of month in selected TZ
+
+      // To find the first day of the month and its weekday in the target timezone:
+      // Create a Date object for the 1st of the current month and year (in UTC to prevent local TZ interference)
+      // Then convert it to the selected timezone's string representation, and then back to a Date object.
+      const firstDayOfMonthRaw = new Date(Date.UTC(year, month, 1));
+      const firstDayOfMonthInTZString = firstDayOfMonthRaw.toLocaleString('en-US', { weekday: 'long', year: 'numeric', month: 'numeric', day: 'numeric', timeZone: selectedCalendarTZ });
+      const firstDayOfMonthInTZ = new Date(firstDayOfMonthInTZString);
+
+      // Similarly for the last day of the month
+      const lastDayOfMonthRaw = new Date(Date.UTC(year, month + 1, 0)); // Day 0 of next month is last day of current
+      const lastDayOfMonthInTZString = lastDayOfMonthRaw.toLocaleString('en-US', { year: 'numeric', month: 'numeric', day: 'numeric', timeZone: selectedCalendarTZ });
+      const lastDayOfMonthInTZ = new Date(lastDayOfMonthInTZString);
+
+      const startDayOfWeek = firstDayOfMonthInTZ.getDay(); // 0 (Sunday) to 6 (Saturday) in selected TZ
+      const totalDaysInMonth = lastDayOfMonthInTZ.getDate(); // Number of days in the month in selected TZ
+
+      const monthName = dateInSelectedTZ.toLocaleString('en-US', { month: 'long', timeZone: selectedCalendarTZ });
+
+
+      let html = `<table aria-label="Calendar for ${monthName} ${year} in ${selectedCalendarTZ}"><caption>${monthName} ${year} (${selectedCalendarTZ.split('/').pop().replace(/_/g, ' ')})</caption><thead><tr>`;
+      const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      daysOfWeek.forEach(d => html += `<th scope="col">${d}</th>`);
+      html += '</tr></thead><tbody><tr>';
+
+      // Fill in leading blank cells
+      for (let i = 0; i < startDayOfWeek; i++) {
+        html += '<td></td>';
+      }
+
+      // Fill in days of the month
+      for (let dayNum = 1; dayNum <= totalDaysInMonth; dayNum++) {
+        const currentCellDayOfWeek = (startDayOfWeek + dayNum - 1) % 7;
+        if (currentCellDayOfWeek === 0 && dayNum !== 1) { // New row for Sunday, unless it's the very first day
+          html += '</tr><tr>';
+        }
+
+        // Determine if 'dayNum' is 'today' within the selected calendar timezone's context
+        const isToday = (dayNum === currentDayInTZ) ? 'today' : '';
+
+        html += `<td class="${isToday}">${dayNum}</td>`;
+      }
+
+      // Fill in trailing blank cells
+      const remainingCells = (7 - ((startDayOfWeek + totalDaysInMonth) % 7)) % 7;
+      for (let i = 0; i < remainingCells; i++) {
+        html += '<td></td>';
+      }
+
+      html += '</tr></tbody></table>';
+      smallCal.innerHTML = html;
+    }
+
+    // Function to populate the timezone select dropdowns
+    function populateTimezoneSelect(selectElement) {
+        let optionsHtml = '';
+        allTimezones.forEach(tz => {
+            optionsHtml += `<option value="${tz.value}" data-country="${tz.country}">${tz.display}</option>`;
+        });
+        selectElement.innerHTML = optionsHtml;
+    }
+
+
+    // --- DST Reminder Logic (Improved Accuracy) ---
+    // Cache for DST info to avoid recalculating frequently
+    let cachedDstInfo = null;
+    let lastDstCheckTime = 0;
+    const DST_CHECK_INTERVAL_MS = 6 * 60 * 60 * 1000; // Check every 6 hours
+
+    function getDstTransition(timeZone) {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const yearsToCheck = [currentYear, currentYear + 1]; // Check current and next year
+
+        let transitions = [];
+
+        yearsToCheck.forEach(year => {
+            // Iterate through all months to find transitions
+            for (let month = 0; month < 12; month++) {
+                // Check around the middle of the month to capture transitions
+                // DST changes typically happen on a Sunday at 2 AM or 3 AM local time.
+                // We'll check a few days in the month to find the change.
+                for (let day = 1; day <= 20; day++) { // Check first 20 days of month
+                    const testDate = new Date(year, month, day, 12, 0, 0); // Midday to avoid edge cases with local time
+                    const prevDate = new Date(testDate.getTime() - (24 * 60 * 60 * 1000)); // 24 hours before
+
+                    try {
+                        const dtf = new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', timeZoneName: 'shortOffset' });
+
+                        const prevFormatted = dtf.formatToParts(prevDate);
+                        const currentFormatted = dtf.formatToParts(testDate);
+
+                        const getOffsetValue = (parts) => {
+                            const offsetPart = parts.find(p => p.type === 'literal' && p.value.includes('GMT'));
+                            if (offsetPart) {
+                                // Extract the numeric offset from GMT+X or GMT-X
+                                const match = offsetPart.value.match(/GMT([+-]\d+)/);
+                                return match ? parseInt(match[1]) : 0;
+                            }
+                            return 0; // Fallback if no GMT offset found
+                        };
+
+                        const prevOffset = getOffsetValue(dtf.formatToParts(prevDate));
+                        const currentOffset = getOffsetValue(dtf.formatToParts(testDate));
+                        
+                        const prevTZName = prevFormatted.find(p => p.type === 'timeZoneName')?.value || '';
+                        const currentTZName = currentFormatted.find(p => p.type === 'timeZoneName')?.value || '';
+
+                        // Detect a change in offset or timezone name
+                        if (prevOffset !== currentOffset || prevTZName !== currentTZName) {
+                            // Found a potential transition. Now find the exact time.
+                            // Iterate hour by hour on the day of the change
+                            const changeDay = new Date(year, month, day);
+                            for (let h = 0; h < 24; h++) {
+                                const checkTime = new Date(changeDay.getFullYear(), changeDay.getMonth(), changeDay.getDate(), h, 0, 0);
+                                const nextHour = new Date(checkTime.getTime() + 60 * 60 * 1000);
+
+                                const checkOffset = getOffsetValue(dtf.formatToParts(checkTime));
+                                const nextOffset = getOffsetValue(dtf.formatToParts(nextHour));
+
+                                if (checkOffset !== nextOffset) {
+                                    const isForward = nextOffset > checkOffset; // Spring forward: offset becomes more positive (e.g., GMT-5 to GMT-4)
+                                    const offsetChange = Math.abs(nextOffset - checkOffset);
+
+                                    transitions.push({
+                                        date: nextHour, // The time *after* the change
+                                        type: isForward ? 'spring-forward' : 'fall-back',
+                                        offsetChange: offsetChange,
+                                        fromName: dtf.formatToParts(checkTime).find(p => p.type === 'timeZoneName')?.value || '',
+                                        toName: dtf.formatToParts(nextHour).find(p => p.type === 'timeZoneName')?.value || ''
+                                    });
+                                    // Break from inner loop, found transition for this day
+                                    break;
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.warn(`Could not get DST info for ${timeZone} at ${testDate.toDateString()}: ${e.message}`);
+                    }
+                }
+            }
+        });
+
+        // Filter out duplicate dates and sort chronologically
+        const uniqueTransitions = [];
+        const seenDates = new Set();
+        transitions.forEach(t => {
+            // Use a unique key for each transition (date + type to distinguish same-day changes)
+            const dateKey = t.date.toISOString() + t.type;
+            if (!seenDates.has(dateKey)) {
+                uniqueTransitions.push(t);
+                seenDates.add(dateKey);
+            }
+        });
+        uniqueTransitions.sort((a, b) => a.date.getTime() - b.date.getTime());
+        return uniqueTransitions;
+    }
+
+
+    function updateDstReminder() {
+        const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const now = new Date();
+
+        // Only re-calculate DST info periodically, not every second
+        if (!cachedDstInfo || (now.getTime() - lastDstCheckTime) > DST_CHECK_INTERVAL_MS) {
+            cachedDstInfo = getDstTransition(userTimeZone);
+            lastDstCheckTime = now.getTime();
+            // console.log("Recalculated DST Info:", cachedDstInfo);
+        }
+
+        const nextChange = cachedDstInfo.find(change => change.date.getTime() > now.getTime());
+
+        if (!nextChange) {
+            dstReminderEl.style.display = 'none'; // No future DST changes found or supported
+            return;
+        }
+
+        const timeRemaining = nextChange.date.getTime() - now.getTime(); // in milliseconds
+        const daysUntil = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        const hoursUntil = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutesUntil = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const secondsUntil = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+        
+        let countdownText = '';
+        if (timeRemaining > 0) {
+            countdownText = `(${daysUntil}d ${hoursUntil}h ${minutesUntil}m ${secondsUntil}s)`;
+        } else {
+            countdownText = '(Happening now or very soon!)';
+            // Once the event passes, force a recalculation on the next update
+            lastDstCheckTime = 0; 
+        }
+
+        const changeType = nextChange.type === 'spring-forward' ? "starts" : "ends";
+        const offsetDirection = nextChange.type === 'spring-forward' ? "forward" : "back";
+        const offsetHours = Math.abs(nextChange.offsetChange); // should be 1 for most places
+
+        // Format the transition date/time in the user's local timezone
+        const transitionDateFormatted = nextChange.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: userTimeZone });
+        const transitionTimeFormatted = nextChange.date.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true, timeZone: userTimeZone });
+
+
+        let message = `Daylight Saving Time ${changeType} on ${transitionDateFormatted} at ${transitionTimeFormatted}.`;
+        message += `<br>Clocks will move ${offsetDirection} by ${offsetHours} hour${offsetHours !== 1 ? 's' : ''}.`;
+        message += `<br>(${nextChange.fromName || 'Standard Time'} → ${nextChange.toName || 'Daylight Time'})`; // Show offset name change, fallback for clarity
+
+        dstReminderEl.innerHTML = `<p>${message}</p>`;
+        if (countdownText) {
+            dstReminderEl.innerHTML += `<span class="countdown">${countdownText}</span>`;
+        }
+        dstReminderEl.style.display = 'block';
+    }
+
+
+    // --- Holiday Reminder Logic ---
+    // Cache for holidays to avoid recalculating frequently
+    let cachedHolidays = null;
+    let lastHolidayCheckYear = null;
+    const HOLIDAY_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // Check once a day
+    let lastHolidayUpdateTime = 0;
+
+    function getUSAHolidays(year) {
+        const holidays = [];
+
+        // Fixed Date Holidays
+        holidays.push({ name: "New Year's Day", date: new Date(year, 0, 1) }); // Jan 1
+        holidays.push({ name: "Juneteenth National Independence Day", date: new Date(year, 5, 19) }); // June 19
+        holidays.push({ name: "Independence Day", date: new Date(year, 6, 4) }); // July 4
+        holidays.push({ name: "Veterans Day", date: new Date(year, 10, 11) }); // Nov 11
+        holidays.push({ name: "Christmas Day", date: new Date(year, 11, 25) }); // Dec 25
+
+        // Floating Holidays (Monday holidays are observed on Monday, even if they fall on a weekend)
+
+        // Martin Luther King, Jr. Day (Third Monday in January)
+        let mlkDay = new Date(year, 0, 1);
+        while (mlkDay.getDay() !== 1 || mlkDay.getDate() < 15) { // Find third Monday (after Jan 15th)
+            mlkDay.setDate(mlkDay.getDate() + 1);
+        }
+        holidays.push({ name: "Martin Luther King, Jr. Day", date: mlkDay });
+
+        // Presidents' Day (Third Monday in February)
+        let presidentsDay = new Date(year, 1, 1);
+        while (presidentsDay.getDay() !== 1 || presidentsDay.getDate() < 15) { // Find third Monday (after Feb 15th)
+            presidentsDay.setDate(presidentsDay.getDate() + 1);
+        }
+        holidays.push({ name: "Presidents' Day", date: presidentsDay });
+
+        // Memorial Day (Last Monday in May)
+        // Find last Monday of May by starting at June 0 (last day of May) and going back
+        let memorialDay = new Date(year, 5, 0); // May 31st for most years, or May 30th etc.
+        while (memorialDay.getDay() !== 1) { // 1 is Monday
+            memorialDay.setDate(memorialDay.getDate() - 1);
+        }
+        holidays.push({ name: "Memorial Day", date: memorialDay });
+
+        // Labor Day (First Monday in September)
+        let laborDay = new Date(year, 8, 1);
+        while (laborDay.getDay() !== 1) { // Find first Monday in September
+            laborDay.setDate(laborDay.getDate() + 1);
+        }
+        holidays.push({ name: "Labor Day", date: laborDay });
+
+        // Columbus Day (Second Monday in October) - Note: not universally observed
+        let columbusDay = new Date(year, 9, 1);
+        while (columbusDay.getDay() !== 1 || columbusDay.getDate() < 8) { // Find second Monday (after Oct 8th)
+            columbusDay.setDate(columbusDay.getDate() + 1);
+        }
+        holidays.push({ name: "Columbus Day", date: columbusDay });
+
+        // Thanksgiving Day (Fourth Thursday in November)
+        let thanksgivingDay = new Date(year, 10, 1);
+        while (thanksgivingDay.getDay() !== 4 || thanksgivingDay.getDate() < 22) { // Find fourth Thursday (after Nov 22nd)
+            thanksgivingDay.setDate(thanksgivingDay.getDate() + 1);
+        }
+        holidays.push({ name: "Thanksgiving Day", date: thanksgivingDay });
+
+
+        // Sort by date to easily find the next one
+        holidays.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+        return holidays;
+    }
+
+    function updateHolidayReminder() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+
+        // Only re-calculate holidays periodically, not every second
+        if (!cachedHolidays || lastHolidayCheckYear !== currentYear || (now.getTime() - lastHolidayUpdateTime) > HOLIDAY_CHECK_INTERVAL_MS) {
+            cachedHolidays = getUSAHolidays(currentYear);
+            // Also get next year's holidays to check for upcoming ones near year-end
+            cachedHolidays = cachedHolidays.concat(getUSAHolidays(currentYear + 1));
+            cachedHolidays.sort((a, b) => a.date.getTime() - b.date.getTime()); // Re-sort combined list
+            lastHolidayCheckYear = currentYear;
+            lastHolidayUpdateTime = now.getTime();
+            // console.log("Recalculated Holidays:", cachedHolidays);
+        }
+
+        const oneWeekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        let holidayForThisWeek = null;
+
+        for (const holiday of cachedHolidays) {
+            // Check if the holiday is in the future or today
+            // And if it's within the next 7 days (inclusive of today)
+            // Use 23:59:59 to ensure it counts for the whole day it falls on
+            const holidayStartOfDay = new Date(holiday.date.getFullYear(), holiday.date.getMonth(), holiday.date.getDate());
+            const nowStartOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const oneWeekFromNowStartOfDay = new Date(oneWeekFromNow.getFullYear(), oneWeekFromNow.getMonth(), oneWeekFromNow.getDate());
+
+            if (holidayStartOfDay.getTime() >= nowStartOfDay.getTime() && holidayStartOfDay.getTime() <= oneWeekFromNowStartOfDay.getTime()) {
+                holidayForThisWeek = holiday;
+                break; // Found the first upcoming holiday within the week
+            }
+        }
+
+        if (holidayForThisWeek) {
+            // Format the holiday date to be in the user's local timezone
+            const holidayDateFormatted = holidayForThisWeek.date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            holidayTextEl.textContent = `${holidayForThisWeek.name} on ${holidayDateFormatted}`;
+            holidayReminderEl.style.display = 'block';
+        } else {
+            holidayTextEl.textContent = "No observed US holidays this week.";
+            holidayReminderEl.style.display = 'block'; // Keep it visible to show "No holidays" message
+        }
+    }
+
+    // --- Year End Countdown Logic ---
+    function updateYearEndCountdown() {
+        const now = new Date();
+        const currentYear = now.getFullYear();
+
+        // Set the end of the year to January 1st of the next year, 00:00:00
+        // This correctly accounts for leap years.
+        const yearEnd = new Date(currentYear + 1, 0, 1, 0, 0, 0); // Month is 0-indexed (0 for Jan)
+
+        const timeLeft = yearEnd - now; // Difference in milliseconds
+
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+        if (timeLeft <= 0) {
+            yearEndCountdownValueEl.textContent = "Happy New Year!";
+        } else {
+            yearEndCountdownValueEl.textContent = `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+        }
+    }
+
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // Populate calendar timezone select
+      populateTimezoneSelect(calendarTimezoneSelect);
+      // Populate other custom timezone selects (if they have their own options)
+      customSelects.forEach(selectEl => {
+          // You might only want to populate if they are initially empty,
+          // or always, depending on whether you want to override default selections.
+          // For now, assume HTML already has default options, so no automatic repopulation here.
+          // If you want all custom selects to always have ALL timezones, uncomment and adjust:
+          // populateTimezoneSelect(selectEl);
+      });
+
+
+      loadTheme();
+      loadBackground();
+      loadSettings(); // Load timezone settings after populating selects
+      loadTodoList(); // Load to-do list
+      loadNotepadContent(); // Load notepad content
+      loadRightSidebarState(); // Load right sidebar state
+
+      updateCardVisibility(); // Apply visibility based on loaded settings
+      updateClocks(); // Initial clock update and calendar render
+      // updateDstReminder(); // Initial DST reminder update (now called by updateClocks)
+      // updateHolidayReminder(); // Initial Holiday reminder update (now by updateClocks)
+      // updateYearEndCountdown(); // Initial Year End Countdown update (now by updateClocks)
+
+
+      // Update clocks every second
+      setInterval(updateClocks, 1000);
+      // DST reminder can be updated less frequently if preferred, e.g., every minute or hour
+      // For now, it updates with clocks every second to show real-time countdown.
+    });
+
+    themeToggle.addEventListener('change', () => {
+      const theme = themeToggle.checked ? 'dark' : 'light';
+      applyTheme(theme);
+      saveTheme(theme);
+    });
+
+    toggles.forEach(toggle => {
+      toggle.addEventListener('change', () => {
+        updateCardVisibility();
+        saveSettings();
+        updateClocks(); // Call updateClocks to refresh titles and data
+      });
+    });
+
+    customSelects.forEach(selectEl => {
+      selectEl.addEventListener('change', () => {
+        saveSettings();
+        updateClocks(); // Update specific card title and time
+      });
+    });
+
+    // New event listener for calendar timezone select
+    calendarTimezoneSelect.addEventListener('change', () => {
+        saveSettings(); // Save the new calendar timezone
+        renderSmallCalendar(); // Re-render the calendar with the new timezone
+    });
+
+    // Background upload logic
+    const bgUploadInput = document.getElementById('bgUploadInput');
+    const clearBackgroundBtn = document.getElementById('clearBackgroundBtn');
+
+    bgUploadInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          document.body.style.backgroundImage = `url(${e.target.result})`;
+          saveBackground(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    clearBackgroundBtn.addEventListener('click', () => {
+      document.body.style.backgroundImage = '';
+      localStorage.removeItem(BACKGROUND_KEY);
+    });
+
+    // To-Do List Event Listeners
+    todoInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            addTodoItem(todoInput.value);
+        }
+    });
+
+    todoList.addEventListener('change', (e) => {
+        if (e.target.type === 'checkbox') {
+            const li = e.target.closest('li');
+            const index = parseInt(li.dataset.index);
+            toggleTodoItem(index);
+        }
+    });
+
+    // Notepad Event Listener (save on input)
+    notepad.addEventListener('input', saveNotepadContent);
+
+    // Right Sidebar Toggle Button Event Listener
+    rightSidebarToggleBtn.addEventListener('click', toggleRightSidebar);
+
+    // Notepad and To-Do List Collapsible Event Listeners
+    notepadCollapsible.addEventListener('toggle', saveSettings);
+    todoListCollapsible.addEventListener('toggle', saveSettings);
+    calculatorCollapsible.addEventListener('toggle', saveSettings); // Save calculator state
+
+    // Calculator Event Listener
+    calculatorButtons.addEventListener('click', (event) => {
+        const button = event.target;
+        const value = button.dataset.value;
+
+        if (button.tagName === 'BUTTON' && value) {
+            if (value >= '0' && value <= '9') {
+                handleNumberClick(value);
+            } else if (value === '.') {
+                handleDecimalClick();
+            } else if (value === '+' || value === '-' || value === '*' || value === '/') {
+                handleOperatorClick(value);
+            } else if (value === '=') {
+                calculate();
+            } else if (value === 'C') {
+                handleClearClick();
+            }
+        }
+    });
+
+  </script>
+</body>
+</html>
